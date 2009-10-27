@@ -612,6 +612,9 @@ LogColors = ""
 #        Default: 0 (false)
 #                 1 (true)
 #
+#    GMAnnounceMessage
+#        Enable (true) or Disable (false) the annoucing of the GM at login/logout
+#
 #    BeepAtStart
 #        Beep at mangosd start finished (mostly work only at Unix/Linux systems)
 #        Default: 1 (true)
@@ -676,6 +679,7 @@ SkillChance.Milling = 0
 OffhandCheckAtTalentsReset = 0
 ClientCacheVersion = 0
 Event.Announce = 0
+AnnonceMJ = true
 BeepAtStart = 1
 Motd = "Welcome to the Massive Network Game Object Server."
 

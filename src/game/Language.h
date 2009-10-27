@@ -815,6 +815,23 @@ enum MangosStrings
     //                                    10000-10999
 
     // Use for custom patches             11000-11999
+	//For GM Announce and GM Stat
+	LANG_ANNOUNCE_MOD                 	= 11000,
+	LANG_ANNOUNCE_MJ                 	= 11001,
+	LANG_ANNOUNCE_DBG                 	= 11002,
+	LANG_ANNOUNCE_ADM                 	= 11003,
+	LANG_ANNOUNCE_SYS                 	= 11004,
+	LANG_ANNOUNCE_DEF                 	= 11005,
+	LANG_GMLOGIN_MOD                 	= 11006,
+	LANG_GMLOGIN_MJ                 	= 11007,
+	LANG_GMLOGIN_DBG                 	= 11008,
+	LANG_GMLOGIN_ADM                 	= 11009,
+	LANG_GMLOGIN_SYS                 	= 11010,
+	LANG_GMLOGOUT_MOD                 	= 11011,
+	LANG_GMLOGOUT_MJ                 	= 11012,
+	LANG_GMLOGOUT_DBG                 	= 11013,
+	LANG_GMLOGOUT_ADM                 	= 11014,
+	LANG_GMLOGOUT_SYS                 	= 11015,
 
     // NOT RESERVED IDS                   12000-1999999999
     // `db_script_string` table index     2000000000-2000009999 (MIN_DB_SCRIPT_STRING_ID-MAX_DB_SCRIPT_STRING_ID)
