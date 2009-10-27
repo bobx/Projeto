@@ -488,6 +488,9 @@ class ChatHandler
         bool HandleRespawnCommand(const char* args);
         bool HandleComeToMeCommand(const char *args);
         bool HandleCombatStopCommand(const char *args);
+		bool HandleFreezeCommand(const char *args);
+        bool HandleUnFreezeCommand(const char *args);
+        bool HandleListFreezeCommand(const char* args);
         bool HandleFlushArenaPointsCommand(const char *args);
         bool HandleRepairitemsCommand(const char* args);
         bool HandleWaterwalkCommand(const char* args);

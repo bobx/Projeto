@@ -832,6 +832,14 @@ enum MangosStrings
 	LANG_GMLOGOUT_DBG                 	= 11013,
 	LANG_GMLOGOUT_ADM                 	= 11014,
 	LANG_GMLOGOUT_SYS                 	= 11015,
+	//For Freeze player command
+	LANG_COMMAND_FREEZE                 = 11016,
+    LANG_COMMAND_FREEZE_ERROR           = 11017,
+    LANG_COMMAND_FREEZE_WRONG           = 11018,
+    LANG_COMMAND_UNFREEZE               = 11019,
+    LANG_COMMAND_NO_FROZEN_PLAYERS      = 11020,
+    LANG_COMMAND_LIST_FREEZE            = 11021,
+    LANG_COMMAND_FROZEN_PLAYERS         = 11022,
 
     // NOT RESERVED IDS                   12000-1999999999
     // `db_script_string` table index     2000000000-2000009999 (MIN_DB_SCRIPT_STRING_ID-MAX_DB_SCRIPT_STRING_ID)
