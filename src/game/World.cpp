@@ -1508,6 +1508,7 @@ void World::SetInitialWorldSettings()
     m_timers[WUPDATE_EVENTS].SetInterval(nextGameEvent);    //depend on next event
 
     sLog.outString( "WORLD: World initialized" );
+	sLog.outString( "Powered by Pandore Core system" );
 }
 
 void World::DetectDBCLang()

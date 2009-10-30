@@ -148,8 +148,9 @@ extern int main(int argc, char **argv)
     sLog.Initialize();
 
     sLog.outString( "%s [realm-daemon]", _FULLVERSION(REVISION_DATE,REVISION_TIME,REVISION_NR,REVISION_ID) );
-    sLog.outString( "<Ctrl-C> to stop.\n" );
-    sLog.outString("Using configuration file %s.", cfg_file);
+	sLog.outString( "Powered by PaNDORe Core System" );
+    sLog.outString( "<Ctrl-C> pour arreter.\n" );
+    sLog.outString("Utilisation du fichier de configuration %s.", cfg_file);
 
     ///- Check the version of the configuration file
     uint32 confVersion = sConfig.GetIntDefault("ConfVersion", 0);

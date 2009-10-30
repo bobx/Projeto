@@ -98,6 +98,7 @@ bool ChatHandler::HandleServerInfoCommand(const char* /*args*/)
         full = _FULLVERSION(REVISION_DATE,REVISION_TIME,REVISION_NR,REVISION_ID);
 
     SendSysMessage(full);
+	SendSysMessage( "Powered by PaNDORe Core System" );
     PSendSysMessage(LANG_USING_SCRIPT_LIB,sWorld.GetScriptsVersion());
     PSendSysMessage(LANG_USING_WORLD_DB,sWorld.GetDBVersion());
     PSendSysMessage(LANG_USING_EVENT_AI,sWorld.GetCreatureEventAIVersion());
