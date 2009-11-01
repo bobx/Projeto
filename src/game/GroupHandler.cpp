@@ -196,6 +196,13 @@ void WorldSession::HandleGroupAcceptOpcode( WorldPacket & /*recv_data*/ )
     if(!group->AddMember(GetPlayer()->GetGUID(), GetPlayer()->GetName()))
         return;
 
+	// Monkey
+	if (sWorld.getConfig(CONFIG_INTERFACTION)) {
+		GetPlayer()->SetGroup(group, subgroup); // Defunct line added for test
+		group->BroadcastGroupUpdate();
+	}
+	// Monkey
+	
 }
 
 void WorldSession::HandleGroupDeclineOpcode( WorldPacket & /*recv_data*/ )

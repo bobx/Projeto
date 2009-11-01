@@ -336,6 +336,10 @@ class MANGOS_DLL_SPEC Group
         InstanceGroupBind* GetBoundInstance(Player* player);
         InstanceGroupBind* GetBoundInstance(Map* aMap);
         BoundInstancesMap& GetBoundInstances(Difficulty difficulty) { return m_boundInstances[difficulty]; }
+		
+		// Monkey
+		void BroadcastGroupUpdate(void);
+		// Monkey
 
     protected:
         bool _addMember(const uint64 &guid, const char* name, bool isAssistant=false);

@@ -784,6 +784,11 @@ Motd = "Welcome to the Massive Network Game Object Server."
 #        Default: 0 (Not allowed)
 #                 1 (Allowed)
 #
+#	Interfaction
+#		Allow Group, Raid, Heal, Buff, and other between both factions
+#		Default: 0 (Not Allowed)
+#				 1 (Allowed)
+#
 #    TalentsInspecting
 #        Allow other players see character talents in inspect dialog (Characters in Gamemaster mode can
 #        inspect talents always)
@@ -801,6 +806,7 @@ AllowTwoSide.Interaction.Auction = 0
 AllowTwoSide.Interaction.Mail = 0
 AllowTwoSide.WhoList = 0
 AllowTwoSide.AddFriend = 0
+Interfaction = 0
 TalentsInspecting = 1
 
 ###################################################################################################################

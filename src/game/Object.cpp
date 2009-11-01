@@ -687,6 +687,54 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer * data, UpdateMask *
                     else
                         *data << (m_uint32Values[ index ] & ~UNIT_DYNFLAG_OTHER_TAGGER);
                 }
+		// Monkey
+		 else if(sWorld.getConfig(CONFIG_INTERFACTION) && (index == UNIT_FIELD_BYTES_2 || index == UNIT_FIELD_FACTIONTEMPLATE))
+		 {
+		     bool ch = false;
+		     if(target->GetTypeId() == TYPEID_PLAYER && GetTypeId() == TYPEID_PLAYER && target != this)
+		     {
+			 if(target->IsInSameGroupWith((Player*)this) || target->IsInSameRaidWith((Player*)this))
+			 {
+			     if(index == UNIT_FIELD_BYTES_2)
+			     {
+			DEBUG_LOG("-- VALUES_UPDATE: Sending '%s' the blue-group-fix from '%s' (flag)", target->GetName(), ((Player*)this)->GetName());
+			*data << ( m_uint32Values[ index ] & (UNIT_BYTE2_FLAG_SANCTUARY << 8) ); // this flag is at uint8 offset 1 !!
+			ch = true;
+			     }
+		     else if(index == UNIT_FIELD_FACTIONTEMPLATE)
+		     {
+			DEBUG_LOG("-- VALUES_UPDATE: Sending '%s' the blue-group-fix from '%s' (faction)", target->GetName(), ((Player*)this)->GetName());
+			if(target->getRace() == RACE_HUMAN)
+			*data << uint32(1);
+			else if(target->getRace() == RACE_ORC)
+			*data << uint32(2);
+			else if(target->getRace() == RACE_DWARF)			
+			*data << uint32(3);
+			else if(target->getRace() == RACE_NIGHTELF)			
+			*data << uint32(4);
+			else if(target->getRace() == RACE_UNDEAD_PLAYER)			
+			*data << uint32(5);
+			else if(target->getRace() == RACE_TAUREN)			
+			*data << uint32(6);
+			else if(target->getRace() == RACE_GNOME)			
+			*data << uint32(115);
+			else if(target->getRace() == RACE_TROLL)
+			*data << uint32(116);
+			else if(target->getRace() == RACE_BLOODELF)
+			*data << uint32(1610);
+			else if(target->getRace() == RACE_DRAENEI)
+			*data << uint32(1629);
+			ch = true;
+		     }
+
+		 }
+     }
+		     if(!ch)
+			 *data << m_uint32Values[ index ];
+
+		 }
+		// Monkey
+
                 else
                 {
                     // send in current format (float as float, uint32 as uint32)
@@ -1663,6 +1711,21 @@ Creature* WorldObject::SummonCreature(uint32 id, float x, float y, float z, floa
     // return the creature therewith the summoner has access to it
     return pCreature;
 }
+
+// Monkey
+void Object::ForceValuesUpdateAtIndex(uint32 i)
+{
+    m_uint32Values_mirror[i] = GetUInt32Value(i) + 1; // makes server think the field changed
+    if(m_inWorld)
+    {
+        if(!m_objectUpdated)
+        {
+            ObjectAccessor::Instance().AddUpdateObject(this);
+            m_objectUpdated = true;
+        }
+    }
+}
+// Monkey
 
 namespace MaNGOS
 {
