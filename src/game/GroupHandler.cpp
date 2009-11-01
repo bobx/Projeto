@@ -196,6 +196,7 @@ void WorldSession::HandleGroupAcceptOpcode( WorldPacket & /*recv_data*/ )
     if(!group->AddMember(GetPlayer()->GetGUID(), GetPlayer()->GetName()))
         return;
 
+	uint8 subgroup = group->GetMemberGroup(GetPlayer()->GetGUID());
 	// Monkey
 	if (sWorld.getConfig(CONFIG_INTERFACTION)) {
 		GetPlayer()->SetGroup(group, subgroup); // Defunct line added for test
