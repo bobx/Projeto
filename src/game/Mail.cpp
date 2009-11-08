@@ -1016,13 +1016,13 @@ void WorldSession::SendExternalMails()
 				uint32 ItemID = fields[5].GetUInt32();
 				uint32 ItemCount = fields[6].GetUInt32();
 
-				Player *receiver = objmgr.GetPlayer( receiver_guid );
+				Player *receiver = sObjectMgr.GetPlayer( receiver_guid );
 
 				if( receiver != 0 )
 				{
 					sLog.outString("EXTERNAL MAIL> Sending mail to %u, Item:%u", receiver_guid, ItemID);
 					
-					uint32 itemTextId = !message.empty() ? objmgr.CreateItemText( message ) : 0;
+					uint32 itemTextId = !message.empty() ? sObjectMgr.CreateItemText( message ) : 0;
 					
 					if ( ItemID != 0 )
 					{

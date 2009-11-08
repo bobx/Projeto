@@ -351,7 +351,7 @@ uint32 Group::RemoveMember(const uint64 &guid, const uint8 &method)
 		
 	// Monkey
 	if (sWorld.getConfig(CONFIG_INTERFACTION)) {
-		// Player *player = objmgr.GetPlayer(guid);
+		// Player *player = sObjectMgr.GetPlayer(guid);
 	}
 	// Monkey
 
@@ -1704,7 +1704,7 @@ void Group::BroadcastGroupUpdate(void)
 {
 	for(member_citerator citr = m_memberSlots.begin(); citr != m_memberSlots.end(); ++citr)
 	{
-	Player *pp = objmgr.GetPlayer(citr->guid);
+	Player *pp = sObjectMgr.GetPlayer(citr->guid);
 	if(pp && pp->IsInWorld())
 		{
 			pp->ForceValuesUpdateAtIndex(UNIT_FIELD_BYTES_2);

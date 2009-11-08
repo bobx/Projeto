@@ -6414,7 +6414,7 @@ bool ChatHandler::HandleFreezeCommand(const char *args)
     {
         name = TargetName;
         normalizePlayerName(name);
-        player = objmgr.GetPlayer(name.c_str()); //get player by #name
+        player = sObjectMgr.GetPlayer(name.c_str()); //get player by #name
     }
 
 
@@ -6503,7 +6503,7 @@ bool ChatHandler::HandleUnFreezeCommand(const char *args)
     {
         name = TargetName;
         normalizePlayerName(name);
-        player = objmgr.GetPlayer(name.c_str()); //get player by #name
+        player = sObjectMgr.GetPlayer(name.c_str()); //get player by #name
     }
 
     //effect
