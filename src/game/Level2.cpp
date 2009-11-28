@@ -44,6 +44,7 @@
 #include <fstream>
 #include <map>
 #include "GlobalEvents.h"
+#include "Config/ConfigEnv.h"
 
 #include "TargetedMovementGenerator.h"                      // for HandleNpcUnFollowCommand
 
@@ -2125,6 +2126,7 @@ bool ChatHandler::HandlePInfoCommand(const char* args)
     uint32 total_player_time = 0;
     uint32 level = 0;
     uint32 latency = 0;
+	uint32 realmID = sConfig.GetIntDefault("RealmId", 0);
 
     // get additional information from Player object
     if(target)
@@ -2163,13 +2165,20 @@ bool ChatHandler::HandlePInfoCommand(const char* args)
     std::string last_ip = GetMangosString(LANG_ERROR);
     uint32 security = 0;
     std::string last_login = GetMangosString(LANG_ERROR);
-
-    QueryResult* result = loginDatabase.PQuery("SELECT username,gmlevel,last_ip,last_login FROM account WHERE id = '%u'",accId);
-    if(result)
+		//                                                                                                 0               1              2                      3                         4                       5                      6
+    QueryResult* result = loginDatabase.PQuery("SELECT a.username, a.gmlevel, a.last_ip, a.last_login, a_fp.accountid, a_fp.security, a_fp.realmid FROM account AS a LEFT JOIN account_forcepermission AS a_fp on a.id = a_fp.accountid WHERE a.id = '%u'", accId);
+     if(result)
     {
         Field* fields = result->Fetch();
         username = fields[0].GetCppString();
-        security = fields[1].GetUInt32();
+        if( fields[4].GetUInt32() != NULL )                                     // checking to see if there is any data in the account_forcepermission for account
+               {
+                       if( fields[6].GetUint32() == realmID )                  // checks to see if there are forced permissions on the realm
+                               security = fields[5].GetUInt16();                       // sets forced permissions
+               }
+               else
+                       security = fields[1].GetUInt32();                               // otherwise sets account permissions
+
 
         if(!m_session || m_session->GetSecurity() >= security)
         {
