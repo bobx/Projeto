@@ -839,7 +839,7 @@ int WorldSocket::HandleAuthSession (WorldPacket& recvPacket)
     
 	if ( fields[10].GetUInt32 () != NULL )					// check to see if data is in account_forcepermission table for account
 	{
-		if ( fields[11].GetUint32 () == realmID )			// check to see if the realm has any forced permissions
+		if ( fields[11].GetUInt32 () == realmID )			// check to see if the realm has any forced permissions
 			security = fields[12].GetUInt16 ();				// set forced permission if so
 	}
 	else

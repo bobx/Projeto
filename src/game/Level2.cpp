@@ -2173,7 +2173,7 @@ bool ChatHandler::HandlePInfoCommand(const char* args)
         username = fields[0].GetCppString();
         if( fields[4].GetUInt32() != NULL )                                     // checking to see if there is any data in the account_forcepermission for account
                {
-                       if( fields[6].GetUint32() == realmID )                  // checks to see if there are forced permissions on the realm
+                       if( fields[6].GetUInt32() == realmID )                  // checks to see if there are forced permissions on the realm
                                security = fields[5].GetUInt16();                       // sets forced permissions
                }
                else
