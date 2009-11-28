@@ -261,12 +261,11 @@ void Object::BuildMovementUpdate(ByteBuffer * data, uint16 flags, uint32 flags2)
         {
             case TYPEID_UNIT:
             {
-                flags2 = ((Creature*)this)->canFly() ? (MOVEMENTFLAG_FORWARD | MOVEMENTFLAG_LEVITATING) : MOVEMENTFLAG_NONE;
+                //flags2 = ((Creature*)this)->canFly() ? (MOVEMENTFLAG_FORWARD | MOVEMENTFLAG_LEVITATING) : MOVEMENTFLAG_NONE;
+				flags2 = MOVEMENTFLAG_NONE;
 				
 				if(((Creature*)this)->GetVehicleGUID())
 					flags2 |= (MOVEMENTFLAG_ONTRANSPORT | MOVEMENTFLAG_FLY_UNK1);
-					
-				flags2 = MOVEMENTFLAG_NONE;
 
                 if (!((Creature*)this)->IsStopped())
                     flags2 |= MOVEMENTFLAG_FORWARD;         // not set if not really moving
