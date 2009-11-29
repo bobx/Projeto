@@ -784,7 +784,7 @@ int WorldSocket::HandleAuthSession (WorldPacket& recvPacket)
 								"a_fp.realmID, "			  //11
 								"a_fp.security "			  //12
                                 "FROM account AS a "
-								"LEFT JOIN account_forcepermission as a_fp on a_fp.AccountID = a_fp.AccountID "
+								"LEFT JOIN account_forcepermission as a_fp on a.id = a_fp.AccountID "
                                 "WHERE username = '%s' ",
                                 safe_account.c_str ());
 
