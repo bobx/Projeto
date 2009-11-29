@@ -770,7 +770,7 @@ int WorldSocket::HandleAuthSession (WorldPacket& recvPacket)
 
     QueryResult *result =
           loginDatabase.PQuery ("SELECT "
-                                "a.id, "                      //0
+								"a.id, "                      //0
                                 "a.gmlevel, "                 //1
                                 "a.sessionkey, "              //2
                                 "a.last_ip, "                 //3
@@ -784,7 +784,7 @@ int WorldSocket::HandleAuthSession (WorldPacket& recvPacket)
 								"a_fp.realmID, "			  //11
 								"a_fp.security "			  //12
                                 "FROM account AS a "
-								"LEFT JOIN account_forcepermission as a_fp "
+								"LEFT JOIN account_forcepermission as a_fp on a.username = a_fp.accountid "
                                 "WHERE username = '%s' ",
                                 safe_account.c_str ());
 
