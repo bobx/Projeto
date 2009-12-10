@@ -502,6 +502,7 @@ class ChatHandler
         bool HandleFlushArenaPointsCommand(const char *args);
         bool HandleRepairitemsCommand(const char* args);
         bool HandleWaterwalkCommand(const char* args);
+        bool HandleQuitCommand(const char* args);
 
  		// Jail by WarHead
         bool HandleJailCommand(const char* args);
