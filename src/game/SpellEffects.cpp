@@ -365,16 +365,8 @@ void Spell::EffectSchoolDMG(uint32 effect_idx)
                 }
                 break;
             }
-
             case SPELLFAMILY_MAGE:
-            {
-                // Arcane Blast
-                if (m_spellInfo->SpellFamilyFlags & UI64LIT(0x20000000))
-                {
-                    m_caster->CastSpell(m_caster, 36032, true);
-                }
                 break;
-            }
             case SPELLFAMILY_WARRIOR:
             {
                 // Bloodthirst
@@ -475,7 +467,8 @@ void Spell::EffectSchoolDMG(uint32 effect_idx)
                     // found Immolate or Shadowflame
                     if (aura)
                     {
-                        int32 damagetick = aura->GetModifier()->m_amount;
+                        // DoT not have applied spell bonuses in m_amount
+                        int32 damagetick = m_caster->SpellDamageBonus(unitTarget, aura->GetSpellProto(), aura->GetModifier()->m_amount, DOT);
                         damage += damagetick * 4;
 
                         // Glyph of Conflagrate
