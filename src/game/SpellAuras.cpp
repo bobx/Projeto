@@ -5934,6 +5934,7 @@ void Aura::HandleSpellSpecificBoosts(bool apply)
             }
             else
                 return;
+            break;
         }
         case SPELLFAMILY_WARRIOR:
         {
@@ -5957,6 +5958,7 @@ void Aura::HandleSpellSpecificBoosts(bool apply)
             break;
         }
         case SPELLFAMILY_WARLOCK:
+        {
             // Fear (non stacking)
             if (m_spellProto->SpellFamilyFlags & UI64LIT(0x0000040000000000))
             {
@@ -5991,6 +5993,7 @@ void Aura::HandleSpellSpecificBoosts(bool apply)
             else
                 return;
             break;
+        }
         case SPELLFAMILY_PRIEST:
         {
             // Shadow Word: Pain (need visual check fro skip improvement talent) or Vampiric Touch
