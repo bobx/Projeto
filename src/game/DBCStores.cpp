@@ -159,6 +159,25 @@ DBCStorage <WorldSafeLocsEntry> sWorldSafeLocsStore(WorldSafeLocsEntryfmt);
 
 typedef std::list<std::string> StoreProblemList;
 
+bool IsAcceptableClientBuild(uint32 build)
+{
+    int accepted_versions[] = EXPECTED_MANGOSD_CLIENT_BUILD;
+    for(int i = 0; accepted_versions[i]; ++i)
+        if(build == accepted_versions[i])
+            return true;
+
+    return false;
+}
+
+std::string AcceptableClientBuildsListStr()
+{
+    std::ostringstream data;
+    int accepted_versions[] = EXPECTED_MANGOSD_CLIENT_BUILD;
+    for(int i = 0; accepted_versions[i]; ++i)
+        data << accepted_versions[i] << " ";
+    return data.str();
+}
+
 static bool LoadDBC_assert_print(uint32 fsize,uint32 rsize, const std::string& filename)
 {
     sLog.outError("ERROR: Size of '%s' setted by format string (%u) not equal size of C++ structure (%u).",filename.c_str(),fsize,rsize);
@@ -177,12 +196,12 @@ inline void LoadDBC(uint32& availableDbcLocales,barGoLink& bar, StoreProblemList
     if(storage.Load(dbc_filename.c_str()))
     {
         bar.step();
-        for(uint8 i = 0; i < MAX_LOCALE; ++i)
+        for(uint8 i = 0; fullLocaleNameList[i].name; ++i)
         {
             if(!(availableDbcLocales & (1 << i)))
                 continue;
 
-            std::string dbc_filename_loc = dbc_path + localeNames[i] + "/" + filename;
+            std::string dbc_filename_loc = dbc_path + fullLocaleNameList[i].name + "/" + filename;
             if(!storage.LoadStringsFrom(dbc_filename_loc.c_str()))
                 availableDbcLocales &= ~(1<<i);             // mark as not available for speedup next checks
         }
@@ -212,6 +231,8 @@ void LoadDBCStores(const std::string& dataPath)
     barGoLink bar( DBCFilesCount );
 
     StoreProblemList bad_dbc_files;
+
+    // bitmask for index of fullLocaleNameList
     uint32 availableDbcLocales = 0xFFFFFFFF;
 
     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sAreaStore,                dbcPath,"AreaTable.dbc");
@@ -511,7 +532,7 @@ void LoadDBCStores(const std::string& dataPath)
         !sAreaStore.LookupEntry(2905)              ||       // last area (areaflag) added in 3.1.3
         !sItemStore.LookupEntry(46894)             )        // last client known item added in 3.1.3
     {
-        sLog.outError("\nYou have _outdated_ DBC files. Please extract correct versions from current using client.");
+        sLog.outError("\nYou have _outdated_ DBC files. Please re-extract DBC files for one from client build: %s",AcceptableClientBuildsListStr().c_str());
         exit(1);
     }
 
