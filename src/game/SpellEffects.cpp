@@ -3421,9 +3421,20 @@ void Spell::EffectSummonType(uint32 i)
         }
         case SUMMON_PROP_GROUP_CONTROLLABLE:
         {
+            switch(prop_id)
+            {
+                //SUMMON_TYPE_POSESSED   = 65
+                //SUMMON_TYPE_POSESSED2   = 428
+                case 65:
+                case 428:
+                    EffectSummonPosessed(i);
+                    break;
+            default: EffectSummonGuardian(i, summon_prop->FactionId);
+            break;
+            }
             // no type here
             // maybe wrong - but thats the handler currently used for those
-            EffectSummonGuardian(i, summon_prop->FactionId);
+            //EffectSummonGuardian(i, summon_prop->FactionId);
             break;
         }
         case SUMMON_PROP_GROUP_VEHICLE:
@@ -3840,6 +3851,59 @@ void Spell::EffectSummonWild(uint32 i, uint32 forceFaction)
         }
     }
 }
+
+void Spell::EffectSummonPosessed(uint32 i)
+ {
+	 uint32 creature_entry = m_spellInfo->EffectMiscValue[i];
+     if(!creature_entry)
+         return;
+
+	 int32 duration = GetSpellDuration(m_spellInfo);
+
+	 float px, py, pz;
+     // If dest location if present
+     if (m_targets.m_targetMask & TARGET_FLAG_DEST_LOCATION)
+     {
+         // Summon 1 unit in dest location
+         px = m_targets.m_destX;
+         py = m_targets.m_destY;
+         pz = m_targets.m_destZ;
+     }
+     // Summon if dest location not present near caster
+     else
+         m_caster->GetClosePoint(px,py,pz,1.0f);
+
+         TempSummonType summonType = (duration == 0) ? TEMPSUMMON_DEAD_DESPAWN : TEMPSUMMON_TIMED_OR_DEAD_DESPAWN;
+	 Creature *spawnCreature = m_caster->SummonCreature(creature_entry,px,py,pz,m_caster->GetOrientation(),summonType,duration);
+
+	 if(!spawnCreature->IsPositionValid())
+         {
+         sLog.outError("Pet (guidlow %d, entry %d) not created base at creature. Suggested coordinates isn't valid (X: %f Y: %f)",
+         spawnCreature->GetGUIDLow(), spawnCreature->GetEntry(), spawnCreature->GetPositionX(), spawnCreature->GetPositionY());
+         delete spawnCreature;
+         return;
+	 }
+
+	 spawnCreature->setFaction(m_caster->getFaction());	 
+ 	 spawnCreature->SetCharmerGUID(m_caster->GetGUID());
+	 spawnCreature->SetCreatorGUID(m_caster->GetGUID());
+
+	 CharmInfo *charmInfo = spawnCreature->InitCharmInfo(spawnCreature);	 
+	 charmInfo->InitPossessCreateSpells();	 
+
+	 if(m_caster->GetTypeId()==TYPEID_PLAYER)
+         {
+	  ((Player*)m_caster)->SetCharm(spawnCreature); 
+	  ((Player*)m_caster)->SetFarSightGUID(spawnCreature->GetGUID());
+          ((Player*)m_caster)->SetClientControl(spawnCreature, 1);
+	  ((Player*)m_caster)->SetMover(spawnCreature);  
+	  ((Player*)m_caster)->PossessSpellInitialize();
+	 }
+	 spawnCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
+
+     spawnCreature->CombatStop();
+     spawnCreature->DeleteThreatList();       
+} 
 
 void Spell::EffectSummonGuardian(uint32 i, uint32 forceFaction)
 {
@@ -4928,6 +4992,38 @@ void Spell::EffectScriptEffect(uint32 effIndex)
         {
             switch(m_spellInfo->Id)
             {
+                // Recall Eye of Acherus
+                case 52694:
+                {
+                    if(!m_caster || m_caster->GetTypeId() != TYPEID_UNIT || !(m_caster->isCharmed()))
+                        return;
+
+                    Creature *eye = ((Creature*)m_caster);
+                    if(m_caster->GetCharmer()->GetTypeId() != TYPEID_PLAYER)
+                    return;
+
+                    Player *player =((Player*)m_caster->GetCharmer());
+                    if(eye->isInCombat())
+                    return;
+
+                    eye->GetMap()->CreatureRelocation(eye,2325,-5660,427,3.83);
+                    eye->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
+                    eye->SetCharmerGUID(0);
+
+                    player->InterruptSpell(CURRENT_CHANNELED_SPELL);
+                    player->RemoveAurasDueToSpell(51852);	// Remove The Eye of Acherus aura
+                    player->RemoveAurasDueToSpell(51923);
+                    player->RemoveAurasDueToSpell(51890);
+                    player->SetCharm(NULL);
+                    player->SetFarSightGUID(0);
+                    player->SetClientControl(m_caster,0);
+                    player->SetMover(NULL);
+                    player->RemovePetActionBar();
+
+                    eye->CleanupsBeforeDelete();
+                    eye->AddObjectToRemoveList();
+                    return;
+                }
                 // Bending Shinbone
                 case 8856:
                 {
