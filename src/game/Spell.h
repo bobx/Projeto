@@ -250,6 +250,7 @@ class Spell
         void EffectAddFarsight(uint32 i);
         void EffectSummonWild(uint32 i, uint32 forceFaction = 0);
         void EffectSummonGuardian(uint32 i, uint32 forceFaction = 0);
+        void EffectSummonPosessed(uint32 i);
         void EffectHealMechanical(uint32 i);
         void EffectJump(uint32 i);
         void EffectTeleUnitsFaceCaster(uint32 i);
