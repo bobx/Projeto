@@ -269,7 +269,7 @@ void WorldSession::HandleLogoutRequestOpcode( WorldPacket & /*recv_data*/ )
         GetPlayer()->duel         ||                        //...is in Duel
 		GetPlayer()->HasAura(9454,0)         ||             //...is frozen by GM
                                                             //...is jumping ...is falling
-        GetPlayer()->m_movementInfo.HasMovementFlag(MovementFlags(MOVEMENTFLAG_JUMPING | MOVEMENTFLAG_FALLING)))
+        GetPlayer()->m_movementInfo.HasMovementFlag(MovementFlags(MOVEFLAG_JUMPING | MOVEFLAG_FALLING)))
     {
         WorldPacket data( SMSG_LOGOUT_RESPONSE, (2+4) ) ;
         data << (uint8)0xC;
@@ -1548,9 +1548,7 @@ void WorldSession::HandleMoveSetCanFlyAckOpcode( WorldPacket & recv_data )
 
     recv_data.read_skip<uint32>();                          // unk
 
-    MovementInfo movementInfo;
-    movementInfo.guid = guid;
-    ReadMovementInfo(recv_data, &movementInfo);
+    MovementInfo movementInfo(recv_data);
 
     recv_data.read_skip<float>();                           // unk2
 
