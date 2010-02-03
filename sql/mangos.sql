@@ -24,7 +24,7 @@ CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
   `cache_id` int(10) default '0',
-  `required_9291_02_mangos_locales_quest` bit(1) default NULL
+  `required_9297_01_mangos_item_template` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -2180,35 +2180,35 @@ CREATE TABLE `item_template` (
   `RangedModRange` float NOT NULL default '0',
   `spellid_1` mediumint(8) unsigned NOT NULL default '0',
   `spelltrigger_1` tinyint(3) unsigned NOT NULL default '0',
-  `spellcharges_1` tinyint(4) NOT NULL default '0',
+  `spellcharges_1` smallint(5) NOT NULL default '0',
   `spellppmRate_1` float NOT NULL default '0',
   `spellcooldown_1` int(11) NOT NULL default '-1',
   `spellcategory_1` smallint(5) unsigned NOT NULL default '0',
   `spellcategorycooldown_1` int(11) NOT NULL default '-1',
   `spellid_2` mediumint(8) unsigned NOT NULL default '0',
   `spelltrigger_2` tinyint(3) unsigned NOT NULL default '0',
-  `spellcharges_2` tinyint(4) NOT NULL default '0',
+  `spellcharges_2` smallint(5) NOT NULL default '0',
   `spellppmRate_2` float NOT NULL default '0',
   `spellcooldown_2` int(11) NOT NULL default '-1',
   `spellcategory_2` smallint(5) unsigned NOT NULL default '0',
   `spellcategorycooldown_2` int(11) NOT NULL default '-1',
   `spellid_3` mediumint(8) unsigned NOT NULL default '0',
   `spelltrigger_3` tinyint(3) unsigned NOT NULL default '0',
-  `spellcharges_3` tinyint(4) NOT NULL default '0',
+  `spellcharges_3` smallint(5) NOT NULL default '0',
   `spellppmRate_3` float NOT NULL default '0',
   `spellcooldown_3` int(11) NOT NULL default '-1',
   `spellcategory_3` smallint(5) unsigned NOT NULL default '0',
   `spellcategorycooldown_3` int(11) NOT NULL default '-1',
   `spellid_4` mediumint(8) unsigned NOT NULL default '0',
   `spelltrigger_4` tinyint(3) unsigned NOT NULL default '0',
-  `spellcharges_4` tinyint(4) NOT NULL default '0',
+  `spellcharges_4` smallint(5) NOT NULL default '0',
   `spellppmRate_4` float NOT NULL default '0',
   `spellcooldown_4` int(11) NOT NULL default '-1',
   `spellcategory_4` smallint(5) unsigned NOT NULL default '0',
   `spellcategorycooldown_4` int(11) NOT NULL default '-1',
   `spellid_5` mediumint(8) unsigned NOT NULL default '0',
   `spelltrigger_5` tinyint(3) unsigned NOT NULL default '0',
-  `spellcharges_5` tinyint(4) NOT NULL default '0',
+  `spellcharges_5` smallint(5) NOT NULL default '0',
   `spellppmRate_5` float NOT NULL default '0',
   `spellcooldown_5` int(11) NOT NULL default '-1',
   `spellcategory_5` smallint(5) unsigned NOT NULL default '0',
@@ -14694,13 +14694,20 @@ INSERT INTO spell_chain VALUES
 (27046,13544,136,8,0),
 (48989,27046,136,9,0),
 (48990,48989,136,10,0),
-/*ScareBeast*/
+/*Scare Beast*/
 (1513,0,1513,1,0),
 (14326,1513,1513,2,0),
 (14327,14326,1513,3,0),
 /*------------------
 --(51)Survival
 ------------------*/
+/*Black Arrow*/
+(3674,0,3674,1,0),
+(63668,3674,3674,2,0),
+(63669,63668,3674,3,0),
+(63670,63669,3674,4,0),
+(63671,63670,3674,5,0),
+(63672,63671,3674,6,0),
 /*Counterattack*/
 (19306,0,19306,1,0),
 (20909,19306,19306,2,0),
@@ -14712,19 +14719,19 @@ INSERT INTO spell_chain VALUES
 (19184,0,19184,1,0),
 (19387,19184,19184,2,0),
 (19388,19387,19184,3,0),
-/*ExplosiveShot*/
+/*Explosive Shot*/
 (53301,0,53301,1,0),
 (60051,53301,53301,2,0),
 (60052,60051,53301,3,0),
 (60053,60052,53301,4,0),
-/*ExplosiveTrap*/
+/*Explosive Trap*/
 (13813,0,13813,1,0),
 (14316,13813,13813,2,0),
 (14317,14316,13813,3,0),
 (27025,14317,13813,4,0),
 (49066,27025,13813,5,0),
 (49067,49066,13813,6,0),
-/*FreezingTrap*/
+/*Freezing Trap*/
 (1499,0,1499,1,0),
 (14310,1499,1499,2,0),
 (14311,14310,1499,3,0),
@@ -14732,7 +14739,7 @@ INSERT INTO spell_chain VALUES
 (53290,0,53290,1,0),
 (53291,53290,53290,2,0),
 (53292,53291,53290,3,0),
-/*ImmolationTrap*/
+/*Immolation Trap*/
 (13795,0,13795,1,0),
 (14302,13795,13795,2,0),
 (14303,14302,13795,3,0),
@@ -14747,14 +14754,14 @@ INSERT INTO spell_chain VALUES
 (34508,34507,34506,3,0),
 (34838,34508,34506,4,0),
 (34839,34838,34506,5,0),
-/*MongooseBite*/
+/*Mongoose Bite*/
 (1495,0,1495,1,0),
 (14269,1495,1495,2,0),
 (14270,14269,1495,3,0),
 (14271,14270,1495,4,0),
 (36916,14271,1495,5,0),
 (53339,36916,1495,6,0),
-/*RaptorStrike*/
+/*Raptor Strike*/
 (2973,0,2973,1,0),
 (14260,2973,2973,2,0),
 (14261,14260,2973,3,0),
