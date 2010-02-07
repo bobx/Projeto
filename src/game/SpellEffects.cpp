@@ -4986,25 +4986,7 @@ void Spell::EffectSummonObjectWild(uint32 i)
         }
     }
 
-    if(uint32 linkedEntry = pGameObj->GetGOInfo()->GetLinkedGameObjectEntry())
-    {
-        GameObject* linkedGO = new GameObject;
-        if(linkedGO->Create(sObjectMgr.GenerateLowGuid(HIGHGUID_GAMEOBJECT), linkedEntry, map,
-            m_caster->GetPhaseMask(), x, y, z, target->GetOrientation(), 0.0f, 0.0f, 0.0f, 0.0f, 100, GO_STATE_READY))
-        {
-            linkedGO->SetRespawnTime(duration > 0 ? duration/IN_MILISECONDS : 0);
-            linkedGO->SetSpellId(m_spellInfo->Id);
-
-            // Wild object not have owner and check clickable by players
-            map->Add(linkedGO);
-        }
-        else
-        {
-            delete linkedGO;
-            linkedGO = NULL;
-            return;
-        }
-    }
+    pGameObj->SummonLinkedTrapIfAny();
 }
 
 void Spell::EffectScriptEffect(uint32 effIndex)
@@ -6237,6 +6219,8 @@ void Spell::EffectSummonObject(uint32 i)
     map->Add(pGameObj);
 
     m_caster->m_ObjectSlot[slot] = pGameObj->GetGUID();
+
+    pGameObj->SummonLinkedTrapIfAny();
 }
 
 void Spell::EffectResurrect(uint32 /*effIndex*/)
@@ -6859,26 +6843,7 @@ void Spell::EffectTransmitted(uint32 effIndex)
 
     cMap->Add(pGameObj);
 
-    if(uint32 linkedEntry = pGameObj->GetGOInfo()->GetLinkedGameObjectEntry())
-    {
-        GameObject* linkedGO = new GameObject;
-        if(linkedGO->Create(sObjectMgr.GenerateLowGuid(HIGHGUID_GAMEOBJECT), linkedEntry, cMap,
-            m_caster->GetPhaseMask(), fx, fy, fz, m_caster->GetOrientation(), 0.0f, 0.0f, 0.0f, 0.0f, 100, GO_STATE_READY))
-        {
-            linkedGO->SetRespawnTime(duration > 0 ? duration/IN_MILISECONDS : 0);
-            linkedGO->SetUInt32Value(GAMEOBJECT_LEVEL, m_caster->getLevel());
-            linkedGO->SetSpellId(m_spellInfo->Id);
-            linkedGO->SetOwnerGUID(m_caster->GetGUID());
-
-            linkedGO->GetMap()->Add(linkedGO);
-        }
-        else
-        {
-            delete linkedGO;
-            linkedGO = NULL;
-            return;
-        }
-    }
+    pGameObj->SummonLinkedTrapIfAny();
 }
 
 void Spell::EffectProspecting(uint32 /*i*/)
