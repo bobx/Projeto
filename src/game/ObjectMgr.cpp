@@ -6319,7 +6319,7 @@ void ObjectMgr::LoadJailConf(void)
 
 		m_jailconf_ally_x       = -8673;
 		m_jailconf_ally_y       = 631;
-		m_jailconf_ally_z       = 967
+		m_jailconf_ally_z       = 967;
 		m_jailconf_ally_o       = 2;
 		m_jailconf_ally_m       = 0;
 
