@@ -6326,7 +6326,7 @@ void ObjectMgr::LoadJailConf(void)
 		m_jailconf_horde_x      = 21780;
 		m_jailconf_horde_y      = -4764;
 		m_jailconf_horde_z      = 55;
-		m_jailconf_horde_o      = 4.;
+		m_jailconf_horde_o      = 4;
 		m_jailconf_horde_m      = 1;
 
 		m_jailconf_ban          = 0;
