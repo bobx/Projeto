@@ -73,6 +73,7 @@ bool ChatHandler::HandleReloadAllCommand(const char*)
     HandleReloadAllQuestCommand("");
     HandleReloadAllSpellCommand("");
     HandleReloadAllItemCommand("");
+    HandleReloadAllGossipsCommand("");
     HandleReloadAllLocalesCommand("");
 
     HandleReloadMailLevelRewardCommand("");
@@ -107,9 +108,10 @@ bool ChatHandler::HandleReloadAllLootCommand(const char*)
     return true;
 }
 
-bool ChatHandler::HandleReloadAllNpcCommand(const char* /*args*/)
+bool ChatHandler::HandleReloadAllNpcCommand(const char* args)
 {
-    HandleReloadNpcGossipCommand("a");
+    if(*args!='a')                                          // will be reloaded from all_gossips
+        HandleReloadNpcGossipCommand("a");
     HandleReloadNpcTrainerCommand("a");
     HandleReloadNpcVendorCommand("a");
     HandleReloadPointsOfInterestCommand("a");
@@ -120,6 +122,7 @@ bool ChatHandler::HandleReloadAllNpcCommand(const char* /*args*/)
 bool ChatHandler::HandleReloadAllQuestCommand(const char* /*args*/)
 {
     HandleReloadQuestAreaTriggersCommand("a");
+    HandleReloadQuestPOICommand("a");
     HandleReloadQuestTemplateCommand("a");
 
     sLog.outString( "Re-Loading Quests Relations..." );
@@ -172,6 +175,17 @@ bool ChatHandler::HandleReloadAllSpellCommand(const char*)
     HandleReloadSpellTargetPositionCommand("a");
     HandleReloadSpellThreatsCommand("a");
     HandleReloadSpellPetAurasCommand("a");
+    return true;
+}
+
+bool ChatHandler::HandleReloadAllGossipsCommand(const char* args)
+{
+    HandleReloadGossipMenuCommand("a");
+    HandleReloadGossipMenuOptionCommand("a");
+    if(*args!='a')                                          // already reload from all_scripts
+        HandleReloadGossipScriptsCommand("a");
+    HandleReloadNpcGossipCommand("a");
+    HandleReloadPointsOfInterestCommand("a");
     return true;
 }
 
@@ -478,6 +492,14 @@ bool ChatHandler::HandleReloadPointsOfInterestCommand(const char*)
     sLog.outString( "Re-Loading `points_of_interest` Table!" );
     sObjectMgr.LoadPointsOfInterest();
     SendGlobalSysMessage("DB table `points_of_interest` reloaded.");
+    return true;
+}
+
+bool ChatHandler::HandleReloadQuestPOICommand(const char*)
+{
+    sLog.outString( "Re-Loading `quest_poi` and `quest_poi_points` Tables!" );
+    sObjectMgr.LoadQuestPOI();
+    SendGlobalSysMessage("DB Table `quest_poi` and `quest_poi_points` reloaded.");
     return true;
 }
 
@@ -2670,7 +2692,7 @@ bool ChatHandler::HandleLookupItemCommand(const char* args)
             ItemLocale const *il = sObjectMgr.GetItemLocale(pProto->ItemId);
             if (il)
             {
-                if (il->Name.size() > loc_idx && !il->Name[loc_idx].empty())
+                if ((int32)il->Name.size() > loc_idx && !il->Name[loc_idx].empty())
                 {
                     std::string name = il->Name[loc_idx];
 
@@ -2975,7 +2997,7 @@ bool ChatHandler::HandleLookupQuestCommand(const char* args)
             QuestLocale const *il = sObjectMgr.GetQuestLocale(qinfo->GetQuestId());
             if (il)
             {
-                if (il->Title.size() > loc_idx && !il->Title[loc_idx].empty())
+                if ((int32)il->Title.size() > loc_idx && !il->Title[loc_idx].empty())
                 {
                     std::string title = il->Title[loc_idx];
 
@@ -3075,7 +3097,7 @@ bool ChatHandler::HandleLookupCreatureCommand(const char* args)
             CreatureLocale const *cl = sObjectMgr.GetCreatureLocale (id);
             if (cl)
             {
-                if (cl->Name.size() > loc_idx && !cl->Name[loc_idx].empty ())
+                if ((int32)cl->Name.size() > loc_idx && !cl->Name[loc_idx].empty ())
                 {
                     std::string name = cl->Name[loc_idx];
 
@@ -3140,7 +3162,7 @@ bool ChatHandler::HandleLookupObjectCommand(const char* args)
             GameObjectLocale const *gl = sObjectMgr.GetGameObjectLocale(id);
             if (gl)
             {
-                if (gl->Name.size() > loc_idx && !gl->Name[loc_idx].empty())
+                if ((int32)gl->Name.size() > loc_idx && !gl->Name[loc_idx].empty())
                 {
                     std::string name = gl->Name[loc_idx];
 
@@ -4452,7 +4474,7 @@ bool ChatHandler::HandleResetSpellsCommand(const char * args)
     Player* target;
     uint64 target_guid;
     std::string target_name;
-    if(!extractPlayerTarget((char*)args,&target,&target_guid,&target_name))
+    if(!extractPlayerTarget((char*)args, &target, &target_guid, &target_name))
         return false;
 
     if(target)
@@ -4477,7 +4499,7 @@ bool ChatHandler::HandleResetTalentsCommand(const char * args)
     Player* target;
     uint64 target_guid;
     std::string target_name;
-    if (!extractPlayerTarget((char*)args,&target,&target_guid,&target_name))
+    if (!extractPlayerTarget((char*)args, &target, &target_guid, &target_name))
     {
         // Try reset talents as Hunter Pet
         Creature* creature = getSelectedCreature();
@@ -4490,7 +4512,7 @@ bool ChatHandler::HandleResetTalentsCommand(const char * args)
                 ((Player*)owner)->SendTalentsInfoData(true);
 
                 ChatHandler((Player*)owner).SendSysMessage(LANG_RESET_PET_TALENTS);
-                if(!m_session || m_session->GetPlayer()!=((Player*)owner))
+                if(!m_session || m_session->GetPlayer() != ((Player*)owner))
                     PSendSysMessage(LANG_RESET_PET_TALENTS_ONLINE,GetNameLink((Player*)owner).c_str());
             }
             return true;
@@ -4506,21 +4528,21 @@ bool ChatHandler::HandleResetTalentsCommand(const char * args)
         target->resetTalents(true);
         target->SendTalentsInfoData(false);
         ChatHandler(target).SendSysMessage(LANG_RESET_TALENTS);
-        if (!m_session || m_session->GetPlayer()!=target)
+        if (!m_session || m_session->GetPlayer() != target)
             PSendSysMessage(LANG_RESET_TALENTS_ONLINE,GetNameLink(target).c_str());
 
         Pet* pet = target->GetPet();
-        Pet::resetTalentsForAllPetsOf(target,pet);
+        Pet::resetTalentsForAllPetsOf(target, pet);
         if(pet)
             target->SendTalentsInfoData(true);
         return true;
     }
     else if (target_guid)
     {
-        uint32 at_flags = AT_LOGIN_NONE | AT_LOGIN_RESET_PET_TALENTS;
-        CharacterDatabase.PExecute("UPDATE characters SET at_login = at_login | '%u' WHERE guid = '%u'",at_flags, GUID_LOPART(target_guid) );
+        uint32 at_flags = AT_LOGIN_RESET_PET_TALENTS;
+        CharacterDatabase.PExecute("UPDATE characters SET at_login = at_login | '%u' WHERE guid = '%u'", at_flags, GUID_LOPART(target_guid) );
         std::string nameLink = playerLink(target_name);
-        PSendSysMessage(LANG_RESET_TALENTS_OFFLINE,nameLink.c_str());
+        PSendSysMessage(LANG_RESET_TALENTS_OFFLINE, nameLink.c_str());
         return true;
     }
 

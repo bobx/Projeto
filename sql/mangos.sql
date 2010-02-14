@@ -24,7 +24,7 @@ CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
   `cache_id` int(10) default '0',
-  `required_9312_01_mangos_quest_template` bit(1) default NULL
+  `required_9366_02_mangos_spell_proc_event` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -13876,6 +13876,11 @@ CREATE TABLE `quest_template` (
   `RewRepFaction3` smallint(5) unsigned NOT NULL default '0' COMMENT 'faction id from Faction.dbc in this case',
   `RewRepFaction4` smallint(5) unsigned NOT NULL default '0' COMMENT 'faction id from Faction.dbc in this case',
   `RewRepFaction5` smallint(5) unsigned NOT NULL default '0' COMMENT 'faction id from Faction.dbc in this case',
+  `RewRepValueId1` tinyint(3) NOT NULL default '0',
+  `RewRepValueId2` tinyint(3) NOT NULL default '0',
+  `RewRepValueId3` tinyint(3) NOT NULL default '0',
+  `RewRepValueId4` tinyint(3) NOT NULL default '0',
+  `RewRepValueId5` tinyint(3) NOT NULL default '0',
   `RewRepValue1` mediumint(9) NOT NULL default '0',
   `RewRepValue2` mediumint(9) NOT NULL default '0',
   `RewRepValue3` mediumint(9) NOT NULL default '0',
@@ -14095,7 +14100,7 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `spell_bonus_data`;
 CREATE TABLE `spell_bonus_data` (
-  `entry` smallint(5) unsigned NOT NULL,
+  `entry` mediumint(8) unsigned NOT NULL,
   `direct_bonus` float NOT NULL default '0',
   `dot_bonus` float NOT NULL default '0',
   `ap_bonus` float NOT NULL default '0',
@@ -14258,7 +14263,8 @@ INSERT INTO `spell_bonus_data` VALUES
 (17712, 0,      0,       0,     'Item - Lifestone Healing'),
 (5707,  0,      0,       0,     'Item - Lifestone Regeneration'),
 (38395, 0,      0,       0,     'Item - Siphon Essence'),
-(40293, 0,      0,       0,     'Item - Siphon Essence');
+(40293, 0,      0,       0,     'Item - Siphon Essence'),
+(71824, 0,      0,       0,     'Item - Shaman T9 Elemental 4P Bonus');
 /*!40000 ALTER TABLE `spell_bonus_data` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -15601,6 +15607,16 @@ INSERT INTO spell_chain VALUES
 (24579,24578,24423,4,0),
 (27051,24579,24423,5,0),
 (55487,27051,24423,6,0),
+/*------------------
+--(214)Pet - Crab
+------------------*/
+/* Sonic Blast */
+(50245,0,50245,1,0),
+(53544,50245,50245,2,0),
+(53545,53544,50245,3,0),
+(53546,53545,50245,4,0),
+(53547,53546,50245,5,0),
+(53548,53547,50245,6,0),
 /*------------------
 --(215)Pet-Gorilla
 --(786)Pet-ExoticRhino
@@ -17145,6 +17161,16 @@ INSERT INTO spell_chain VALUES
 (9485,9484,9484,2,0),
 (10955,9485,9484,3,0),
 /*------------------
+--(654)Pet - Bat
+------------------*/
+/* Pin */
+(50519,0,50519,1,0),
+(53564,50519,50519,2,0),
+(53565,53564,50519,3,0),
+(53566,53565,50519,4,0),
+(53567,53566,50519,5,0),
+(53568,53567,50519,6,0),
+/*------------------
 --(654)Pet-Hyena
 ------------------*/
 /*TendonRip*/
@@ -18627,6 +18653,7 @@ INSERT INTO `spell_proc_event` VALUES
 (64976, 0x00000000,  4, 0x00000001, 0x00000000, 0x00000000, 0x00010000, 0x00000000, 0.000000, 0.000000,  0),
 (65661, 0x00000000, 15, 0x00400011, 0x00020004, 0x00000000, 0x00000010, 0x00000001, 0.000000, 100.000000,0),
 (64127, 0x00000000,  6, 0x00000001, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0.000000, 0.000000,  0),
+(67228, 0x00000004, 11, 0x00000000, 0x00001000, 0x00000000, 0x00000000, 0x00000000, 0.000000, 0.000000,  0),
 (67353, 0x00000000,  7, 0x00008000, 0x00100500, 0x00000000, 0x00000000, 0x00000000, 0.000000, 0.000000,  0),
 (67667, 0x00000000,  0, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0.000000, 0.000000, 45),
 (67672, 0x00000000,  0, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0.000000, 0.000000, 50),

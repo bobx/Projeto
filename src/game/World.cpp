@@ -1181,6 +1181,9 @@ void World::SetInitialWorldSettings()
     sLog.outString( "Packing instances..." );
     sInstanceSaveMgr.PackInstances();
 
+    sLog.outString( "Packing groups..." );
+    sObjectMgr.PackGroupIds();
+
     sLog.outString();
     sLog.outString( "Loading Localization strings..." );
     sObjectMgr.LoadCreatureLocales();
