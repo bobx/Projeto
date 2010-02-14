@@ -5558,7 +5558,7 @@ bool ChatHandler::HandlePDumpWriteCommand(const char *args)
             return false;
         }
 
-        guid = sObjectMgr.GetPlayerGUIDByName(name);
+        guid = GUID_LOPART(sObjectMgr.GetPlayerGUIDByName(name));
     }
 
     if(!sObjectMgr.GetPlayerAccountIdByGUID(guid))
@@ -5905,7 +5905,7 @@ bool ChatHandler::HandleComeToMeCommand(const char *args)
 
     uint32 newFlags = atoi(newFlagStr);
 
-    caster->SetMonsterMoveFlags(MonsterMovementFlags(newFlags));
+    caster->SetSplineFlags(SplineFlags(newFlags));
 
     Player* pl = m_session->GetPlayer();
 

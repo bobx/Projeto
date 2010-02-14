@@ -476,7 +476,7 @@ bool ChatHandler::HandleGameObjectTargetCommand(const char* args)
         o =       fields[5].GetFloat();
         mapid =   fields[6].GetUInt16();
         pool_id = sPoolMgr.IsPartOfAPool<GameObject>(lowguid);
-        if (!pool_id || (pool_id && sPoolMgr.IsSpawnedObject<GameObject>(pool_id, lowguid)))
+        if (!pool_id || sPoolMgr.IsSpawnedObject<GameObject>(lowguid))
             found = true;
     } while( result->NextRow() && (!found) );
 
@@ -2164,7 +2164,7 @@ bool ChatHandler::HandlePInfoCommand(const char* args)
 
     std::string username = GetMangosString(LANG_ERROR);
     std::string last_ip = GetMangosString(LANG_ERROR);
-    uint32 security = 0;
+    AccountTypes security = SEC_PLAYER;
     std::string last_login = GetMangosString(LANG_ERROR);
 		//                                             	0			1			2			3			4					5			6
     QueryResult* result = loginDatabase.PQuery("SELECT a.username, a.gmlevel, a.last_ip, a.last_login, a_fp.accountid, a_fp.security, a_fp.realmid FROM account AS a LEFT JOIN account_forcepermission AS a_fp on a.id = a_fp.accountid WHERE a.id = '%u'", accId);
@@ -2175,10 +2175,10 @@ bool ChatHandler::HandlePInfoCommand(const char* args)
         if( fields[4].GetUInt32() != NULL )                                     // checking to see if there is any data in the account_forcepermission for account
                {
                        if( fields[6].GetUInt32() == realmID )                  // checks to see if there are forced permissions on the realm
-                               security = fields[5].GetUInt16();                       // sets forced permissions
+                               security = (AccountTypes)fields[5].GetUInt16();                       // sets forced permissions
                }
                else
-                       security = fields[1].GetUInt32();                               // otherwise sets account permissions
+                       security = (AccountTypes)fields[1].GetUInt32();                               // otherwise sets account permissions
 
 
         if(!m_session || m_session->GetSecurity() >= security)
@@ -3729,7 +3729,7 @@ bool ChatHandler::HandleHonorAddCommand(const char* args)
     if (HasLowerSecurity(target, 0))
         return false;
 
-    uint32 amount = (uint32)atoi(args);
+    float amount = (float)atof(args);
     target->RewardHonor(NULL, 1, amount);
     return true;
 }
