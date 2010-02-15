@@ -5088,7 +5088,7 @@ void Spell::EffectScriptEffect(uint32 effIndex)
                     if(eye->isInCombat())
                     return;
 
-                    eye->GetMap()->CreatureRelocation(eye,2325,-5660,427,3.83);
+                    eye->GetMap()->CreatureRelocation(eye,2325,-5660,427,4);
                     eye->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
                     eye->SetCharmerGUID(0);
 
