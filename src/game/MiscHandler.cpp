@@ -136,8 +136,8 @@ void WorldSession::HandleWhoOpcode( WorldPacket & recv_data )
 
     uint32 team = _player->GetTeam();
     uint32 security = GetSecurity();
-    bool allowTwoSideWhoList = sWorld.getConfig(CONFIG_ALLOW_TWO_SIDE_WHO_LIST);
-    AccountTypes gmLevelInWhoList = (AccountTypes)sWorld.getConfig(CONFIG_GM_LEVEL_IN_WHO_LIST);
+    bool allowTwoSideWhoList = sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_WHO_LIST);
+    AccountTypes gmLevelInWhoList = (AccountTypes)sWorld.getConfig(CONFIG_UINT32_GM_LEVEL_IN_WHO_LIST);
 
     WorldPacket data( SMSG_WHO, 50 );                       // guess size
     data << clientcount;                                    // clientcount place holder
@@ -149,7 +149,7 @@ void WorldSession::HandleWhoOpcode( WorldPacket & recv_data )
     {
         if (security == SEC_PLAYER)
         {
-            // player can see member of other team only if CONFIG_ALLOW_TWO_SIDE_WHO_LIST
+            // player can see member of other team only if CONFIG_BOOL_ALLOW_TWO_SIDE_WHO_LIST
             if (itr->second->GetTeam() != team && !allowTwoSideWhoList )
                 continue;
 
@@ -282,7 +282,7 @@ void WorldSession::HandleLogoutRequestOpcode( WorldPacket & /*recv_data*/ )
 
     //instant logout in taverns/cities or on taxi or for admins, gm's, mod's if its enabled in mangosd.conf
     if (GetPlayer()->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING) || GetPlayer()->isInFlight() ||
-        GetSecurity() >= (AccountTypes)sWorld.getConfig(CONFIG_INSTANT_LOGOUT))
+        GetSecurity() >= (AccountTypes)sWorld.getConfig(CONFIG_UINT32_INSTANT_LOGOUT))
     {
 	bool Annonce = sConfig.GetBoolDefault("AnnonceMJ",true);
 	if(Annonce)
@@ -496,7 +496,7 @@ void WorldSession::HandleAddFriendOpcodeCallBack(QueryResult *result, uint32 acc
     {
         if(friendGuid==session->GetPlayer()->GetGUID())
             friendResult = FRIEND_SELF;
-        else if(session->GetPlayer()->GetTeam() != team && !sWorld.getConfig(CONFIG_ALLOW_TWO_SIDE_ADD_FRIEND) && session->GetSecurity() < SEC_MODERATOR)
+        else if(session->GetPlayer()->GetTeam() != team && !sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_ADD_FRIEND) && session->GetSecurity() < SEC_MODERATOR)
             friendResult = FRIEND_ENEMY;
         else if(session->GetPlayer()->GetSocial()->HasFriend(GUID_LOPART(friendGuid)))
             friendResult = FRIEND_ALREADY;
@@ -817,7 +817,7 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket & recv_data)
     if(!GetPlayer()->isGameMaster())
     {
         uint32 missingLevel = 0;
-        if(GetPlayer()->getLevel() < at->requiredLevel && !sWorld.getConfig(CONFIG_INSTANCE_IGNORE_LEVEL))
+        if(GetPlayer()->getLevel() < at->requiredLevel && !sWorld.getConfig(CONFIG_BOOL_INSTANCE_IGNORE_LEVEL))
             missingLevel = at->requiredLevel;
 
         // must have one or the other, report the first one that's missing
@@ -1160,7 +1160,7 @@ void WorldSession::HandleInspectOpcode(WorldPacket& recv_data)
     WorldPacket data(SMSG_INSPECT_TALENT, 50);
     data.append(plr->GetPackGUID());
 
-    if(sWorld.getConfig(CONFIG_TALENTS_INSPECTING) || _player->isGameMaster())
+    if(sWorld.getConfig(CONFIG_BOOL_TALENTS_INSPECTING) || _player->isGameMaster())
     {
         plr->BuildPlayerTalentsInfoData(&data);
         plr->BuildEnchantmentsInfoData(&data);
