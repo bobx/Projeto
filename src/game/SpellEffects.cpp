@@ -5106,6 +5106,15 @@ void Spell::EffectScriptEffect(uint32 effIndex)
                     eye->AddObjectToRemoveList();
                     return;
                 }
+                // Summon Ghouls On Scarlet Crusade
+                case 51904:
+                {
+                    if(!unitTarget)
+                        return;
+
+                    unitTarget->CastSpell(unitTarget, 54522, true);
+                    break;
+                }
                 // Bending Shinbone
                 case 8856:
                 {

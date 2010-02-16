@@ -6318,12 +6318,12 @@ void ObjectMgr::LoadJailConf(void)
 		m_jailconf_amnestie     = 180;
 
 		m_jailconf_ally_x       = -8673;
-		m_jailconf_ally_y       = 631;
+		m_jailconf_ally_y       = 632;
 		m_jailconf_ally_z       = 97;
 		m_jailconf_ally_o       = 2;
 		m_jailconf_ally_m       = 0;
 
-		m_jailconf_horde_x      = 21780;
+		m_jailconf_horde_x      = 2180;
 		m_jailconf_horde_y      = -4764;
 		m_jailconf_horde_z      = 55;
 		m_jailconf_horde_o      = 4;

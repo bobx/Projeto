@@ -532,12 +532,14 @@ void WorldSession::HandleInitiateTradeOpcode(WorldPacket& recvPacket)
         return;
     }
 
-    if (pOther->GetTeam() !=_player->GetTeam() )
+	//Monkey
+    if (!sWorld.getConfig(CONFIG_BOOL_INTERFACTION) && pOther->GetTeam() !=_player->GetTeam() )
     {
         SendTradeStatus(TRADE_STATUS_WRONG_FACTION);
         return;
     }
-
+	//Monkey
+	
     if (!pOther->IsWithinDistInMap(_player,10.0f,false))
     {
         SendTradeStatus(TRADE_STATUS_TARGET_TO_FAR);
