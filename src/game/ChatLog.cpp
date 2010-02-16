@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
- 
+
 #include "Common.h"
 #include "ChatLexicsCutter.h"
 #include "ChatLog.h"
@@ -26,9 +26,9 @@
 #include "SpellAuras.h"
 #include "Policies/SingletonImp.h"
 #include "Config/ConfigEnv.h"
- 
+
 INSTANTIATE_SINGLETON_1( ChatLog );
- 
+
 ChatLog::ChatLog()
 {
     for (int i = 0; i <= CHATLOG_CHAT_TYPES_COUNT - 1; i++)
@@ -36,26 +36,26 @@ ChatLog::ChatLog()
         names[i] = "";
         files[i] = NULL;
     }
- 
+
     Lexics = NULL;
     fn_innormative = "";
     f_innormative = NULL;
- 
+
     Initialize();
 }
- 
+
 ChatLog::~ChatLog()
 {
     // close all files (avoiding double-close)
     CloseAllFiles();
- 
+
     if (Lexics)
     {
         delete Lexics;
         Lexics = NULL;
     }
 }
- 
+
 void ChatLog::Initialize()
 {
     // determine, if the chat logs are enabled
@@ -63,7 +63,7 @@ void ChatLog::Initialize()
     ChatLogDateSplit = sConfig.GetBoolDefault("ChatLogDateSplit", false);
     ChatLogUTFHeader = sConfig.GetBoolDefault("ChatLogUTFHeader", false);
     ChatLogIgnoreUnprintable = sConfig.GetBoolDefault("ChatLogIgnoreUnprintable", false);
- 
+
     if (ChatLogEnable)
     {
         // read chat log file names
@@ -74,7 +74,7 @@ void ChatLog::Initialize()
         names[CHAT_LOG_CHANNEL] = sConfig.GetStringDefault("ChatLogChannelFile", "");
         names[CHAT_LOG_RAID] = sConfig.GetStringDefault("ChatLogRaidFile", "");
         names[CHAT_LOG_BATTLEGROUND] = sConfig.GetStringDefault("ChatLogBattleGroundFile", "");
- 
+
         // read screen log flags
         screenflag[CHAT_LOG_CHAT] = sConfig.GetBoolDefault("ChatLogChatScreen", false);
         screenflag[CHAT_LOG_PARTY] = sConfig.GetBoolDefault("ChatLogPartyScreen", false);
@@ -84,10 +84,10 @@ void ChatLog::Initialize()
         screenflag[CHAT_LOG_RAID] = sConfig.GetBoolDefault("ChatLogRaidScreen", false);
         screenflag[CHAT_LOG_BATTLEGROUND] = sConfig.GetBoolDefault("ChatLogBattleGroundScreen", false);
     }
- 
+
     // lexics cutter
     LexicsCutterEnable = sConfig.GetBoolDefault("LexicsCutterEnable", false);
- 
+
     if (LexicsCutterEnable)
     {
         // initialize lexics cutter parameters
@@ -99,7 +99,7 @@ void ChatLog::Initialize()
         LexicsCutterActionDuration = sConfig.GetIntDefault("LexicsCutterActionDuration", 60000);
         std::string fn_analogsfile = sConfig.GetStringDefault("LexicsCutterAnalogsFile", "");
         std::string fn_wordsfile = sConfig.GetStringDefault("LexicsCutterWordsFile", "");
- 
+
         // read lexics cutter flags
         cutflag[CHAT_LOG_CHAT] = sConfig.GetBoolDefault("LexicsCutInChat", true);
         cutflag[CHAT_LOG_PARTY] = sConfig.GetBoolDefault("LexicsCutInParty", true);
@@ -108,7 +108,7 @@ void ChatLog::Initialize()
         cutflag[CHAT_LOG_CHANNEL] = sConfig.GetBoolDefault("LexicsCutInChannel", true);
         cutflag[CHAT_LOG_RAID] = sConfig.GetBoolDefault("LexicsCutInRaid", true);
         cutflag[CHAT_LOG_BATTLEGROUND] = sConfig.GetBoolDefault("LexicsCutInBattleGround", true);
- 
+
         if (fn_analogsfile == "" || fn_wordsfile == "")
         {
             LexicsCutterEnable = false;
@@ -120,27 +120,27 @@ void ChatLog::Initialize()
             if (Lexics) Lexics->Read_Letter_Analogs(fn_analogsfile);
             if (Lexics) Lexics->Read_Innormative_Words(fn_wordsfile);
             if (Lexics) Lexics->Map_Innormative_Words();
- 
+
             // read additional parameters
             Lexics->IgnoreLetterRepeat = sConfig.GetBoolDefault("LexicsCutterIgnoreRepeats", true);
             Lexics->IgnoreMiddleSpaces = sConfig.GetBoolDefault("LexicsCutterIgnoreSpaces", true);
             fn_innormative = sConfig.GetStringDefault("LexicsCutterLogFile", "");
         }
     }
- 
+
     // open all files (with aliasing)
     OpenAllFiles();
- 
+
     // write timestamps (init)
     WriteInitStamps();
 }
- 
+
 bool ChatLog::_ChatCommon(int ChatType, Player *player, std::string &msg)
 {
     if (LexicsCutterEnable && Lexics && cutflag[ChatType] && Lexics->Check_Lexics(msg)) ChatBadLexicsAction(player, msg);
- 
+
     if (!ChatLogEnable) return(false);
- 
+
     if (ChatLogIgnoreUnprintable)
     {
         // have to ignore unprintables, verify string by UTF8 here
@@ -154,37 +154,37 @@ bool ChatLog::_ChatCommon(int ChatType, Player *player, std::string &msg)
             }
         }
     }
- 
+
     return(true);
 }
- 
+
 void ChatLog::ChatMsg(Player *player, std::string &msg, uint32 type)
 {
     if (!_ChatCommon(CHAT_LOG_CHAT, player, msg)) return;
- 
+
     CheckDateSwitch();
- 
+
     std::string log_str = "";
- 
+
     switch (type)
     {
         case CHAT_MSG_EMOTE:
         log_str.append("{EMOTE} ");
         break;
- 
+
         case CHAT_MSG_YELL:
         log_str.append("{YELL} ");
         break;
     }
- 
+
     log_str.append("[");
     log_str.append(player->GetName());
     log_str.append("] ");
- 
+
     log_str.append(msg);
- 
+
     log_str.append("\n");
- 
+
     if (screenflag[CHAT_LOG_CHAT]) printf("%s", log_str.c_str());
     if (files[CHAT_LOG_CHAT])
     {
@@ -193,19 +193,19 @@ void ChatLog::ChatMsg(Player *player, std::string &msg, uint32 type)
         fflush(files[CHAT_LOG_CHAT]);
     }
 }
- 
+
 void ChatLog::PartyMsg(Player *player, std::string &msg)
 {
     if (!_ChatCommon(CHAT_LOG_PARTY, player, msg)) return;
- 
+
     CheckDateSwitch();
- 
+
     std::string log_str = "";
- 
+
     log_str.append("[");
     log_str.append(player->GetName());
     log_str.append("]->GROUP:");
- 
+
     Group *group = player->GetGroup();
     if (!group)
     {
@@ -215,25 +215,25 @@ void ChatLog::PartyMsg(Player *player, std::string &msg)
     {
         // obtain group information
         log_str.append("[");
- 
+
         uint8 gm_count = group->GetMembersCount();
         uint8 gm_count_m1 = gm_count - 1;
         uint64 gm_leader_GUID = group->GetLeaderGUID();
         Player *gm_member;
- 
+
         gm_member = sObjectMgr.GetPlayer(gm_leader_GUID);
         if (gm_member)
         {
             log_str.append(gm_member->GetName());
             log_str.append(",");
         }
- 
+
         Group::MemberSlotList g_members = group->GetMemberSlots();
- 
+
         for (Group::member_citerator itr = g_members.begin(); itr != g_members.end(); itr++)
         {
             if (itr->guid == gm_leader_GUID) continue;
- 
+
             gm_member = sObjectMgr.GetPlayer(itr->guid);
             if (gm_member)
             {
@@ -241,15 +241,15 @@ void ChatLog::PartyMsg(Player *player, std::string &msg)
                 log_str.append(",");
             }
         }
- 
+
         log_str.erase(log_str.length() - 1);
         log_str.append("] ");
     }
- 
+
     log_str.append(msg);
- 
+
     log_str.append("\n");
- 
+
     if (screenflag[CHAT_LOG_PARTY]) printf("%s", log_str.c_str());
     if (files[CHAT_LOG_PARTY])
     {
@@ -258,19 +258,19 @@ void ChatLog::PartyMsg(Player *player, std::string &msg)
         fflush(files[CHAT_LOG_PARTY]);
     }
 }
- 
+
 void ChatLog::GuildMsg(Player *player, std::string &msg, bool officer)
 {
     if (!_ChatCommon(CHAT_LOG_GUILD, player, msg)) return;
- 
+
     CheckDateSwitch();
- 
+
     std::string log_str = "";
- 
+
     log_str.append("[");
     log_str.append(player->GetName());
     log_str.append((officer ? "]->GUILD_OFF:" : "]->GUILD:"));
- 
+
     if (!player->GetGuildId())
     {
         log_str.append("[unknown guild] ");
@@ -290,11 +290,11 @@ void ChatLog::GuildMsg(Player *player, std::string &msg, bool officer)
             log_str.append(") ");
         }
     }
- 
+
     log_str.append(msg);
- 
+
     log_str.append("\n");
- 
+
     if (screenflag[CHAT_LOG_GUILD]) printf("%s", log_str.c_str());
     if (files[CHAT_LOG_GUILD])
     {
@@ -303,19 +303,19 @@ void ChatLog::GuildMsg(Player *player, std::string &msg, bool officer)
         fflush(files[CHAT_LOG_GUILD]);
     }
 }
- 
+
 void ChatLog::WhisperMsg(Player *player, std::string &to, std::string &msg)
 {
     if (!_ChatCommon(CHAT_LOG_WHISPER, player, msg)) return;
- 
+
     CheckDateSwitch();
- 
+
     std::string log_str = "";
- 
+
     log_str.append("[");
     log_str.append(player->GetName());
     log_str.append("]->");
- 
+
     if (to.size() == 0)
     {
         log_str.append("[???] ");
@@ -327,11 +327,11 @@ void ChatLog::WhisperMsg(Player *player, std::string &to, std::string &msg)
         log_str.append(to);
         log_str.append("] ");
     }
- 
+
     log_str.append(msg);
- 
+
     log_str.append("\n");
- 
+
     if (screenflag[CHAT_LOG_WHISPER]) printf("%s", log_str.c_str());
     if (files[CHAT_LOG_WHISPER])
     {
@@ -340,19 +340,19 @@ void ChatLog::WhisperMsg(Player *player, std::string &to, std::string &msg)
         fflush(files[CHAT_LOG_WHISPER]);
     }
 }
- 
+
 void ChatLog::ChannelMsg(Player *player, std::string &channel, std::string &msg)
 {
     if (!_ChatCommon(CHAT_LOG_CHANNEL, player, msg)) return;
- 
+
     CheckDateSwitch();
- 
+
     std::string log_str = "";
- 
+
     log_str.append("[");
     log_str.append(player->GetName());
     log_str.append("]->CHANNEL:");
- 
+
     if (channel.size() == 0)
     {
         log_str.append("[unknown channel] ");
@@ -363,11 +363,11 @@ void ChatLog::ChannelMsg(Player *player, std::string &channel, std::string &msg)
         log_str.append(channel);
         log_str.append("] ");
     }
- 
+
     log_str.append(msg);
- 
+
     log_str.append("\n");
- 
+
     if (screenflag[CHAT_LOG_CHANNEL]) printf("%s", log_str.c_str());
     if (files[CHAT_LOG_CHANNEL])
     {
@@ -376,36 +376,36 @@ void ChatLog::ChannelMsg(Player *player, std::string &channel, std::string &msg)
         fflush(files[CHAT_LOG_CHANNEL]);
     }
 }
- 
+
 void ChatLog::RaidMsg(Player *player, std::string &msg, uint32 type)
 {
     if (!_ChatCommon(CHAT_LOG_RAID, player, msg)) return;
- 
+
     CheckDateSwitch();
- 
+
     std::string log_str = "";
- 
+
     log_str.append("[");
     log_str.append(player->GetName());
- 
+
     switch (type)
     {
         case CHAT_MSG_RAID:
         log_str.append("]->RAID:");
         break;
- 
+
         case CHAT_MSG_RAID_LEADER:
         log_str.append("]->RAID_LEADER:");
         break;
- 
+
         case CHAT_MSG_RAID_WARNING:
         log_str.append("]->RAID_WARN:");
         break;
- 
+
         default:
         log_str.append("]->RAID_UNKNOWN:");
     }
- 
+
     Group *group = player->GetGroup();
     if (!group)
     {
@@ -415,25 +415,25 @@ void ChatLog::RaidMsg(Player *player, std::string &msg, uint32 type)
     {
         // obtain group information
         log_str.append("[");
- 
+
         uint8 gm_count = group->GetMembersCount();
         uint8 gm_count_m1 = gm_count - 1;
         uint64 gm_leader_GUID = group->GetLeaderGUID();
         Player *gm_member;
- 
+
         gm_member = sObjectMgr.GetPlayer(gm_leader_GUID);
         if (gm_member)
         {
             log_str.append(gm_member->GetName());
             log_str.append(",");
         }
- 
+
         Group::MemberSlotList g_members = group->GetMemberSlots();
- 
+
         for (Group::member_citerator itr = g_members.begin(); itr != g_members.end(); itr++)
         {
             if (itr->guid == gm_leader_GUID) continue;
- 
+
             gm_member = sObjectMgr.GetPlayer(itr->guid);
             if (gm_member)
             {
@@ -441,15 +441,15 @@ void ChatLog::RaidMsg(Player *player, std::string &msg, uint32 type)
                 log_str.append(",");
             }
         }
- 
+
         log_str.erase(log_str.length() - 1);
         log_str.append("] ");
     }
- 
+
     log_str.append(msg);
- 
+
     log_str.append("\n");
- 
+
     if (screenflag[CHAT_LOG_RAID]) printf("%s", log_str.c_str());
     if (files[CHAT_LOG_RAID])
     {
@@ -458,32 +458,32 @@ void ChatLog::RaidMsg(Player *player, std::string &msg, uint32 type)
         fflush(files[CHAT_LOG_RAID]);
     }
 }
- 
+
 void ChatLog::BattleGroundMsg(Player *player, std::string &msg, uint32 type)
 {
     if (!_ChatCommon(CHAT_LOG_BATTLEGROUND, player, msg)) return;
- 
+
     CheckDateSwitch();
- 
+
     std::string log_str = "";
- 
+
     log_str.append("[");
     log_str.append(player->GetName());
- 
+
     switch (type)
     {
         case CHAT_MSG_BATTLEGROUND:
         log_str.append("]->BG:");
         break;
- 
+
         case CHAT_MSG_BATTLEGROUND_LEADER:
         log_str.append("]->BG_LEADER:");
         break;
- 
+
         default:
         log_str.append("]->BG_UNKNOWN:");
     }
- 
+
     Group *group = player->GetGroup();
     if (!group)
     {
@@ -493,25 +493,25 @@ void ChatLog::BattleGroundMsg(Player *player, std::string &msg, uint32 type)
     {
         // obtain group information
         log_str.append("[");
- 
+
         uint8 gm_count = group->GetMembersCount();
         uint8 gm_count_m1 = gm_count - 1;
         uint64 gm_leader_GUID = group->GetLeaderGUID();
         Player *gm_member;
- 
+
         gm_member = sObjectMgr.GetPlayer(gm_leader_GUID);
         if (gm_member)
         {
             log_str.append(gm_member->GetName());
             log_str.append(",");
         }
- 
+
         Group::MemberSlotList g_members = group->GetMemberSlots();
- 
+
         for (Group::member_citerator itr = g_members.begin(); itr != g_members.end(); itr++)
         {
             if (itr->guid == gm_leader_GUID) continue;
- 
+
             gm_member = sObjectMgr.GetPlayer(itr->guid);
             if (gm_member)
             {
@@ -519,15 +519,15 @@ void ChatLog::BattleGroundMsg(Player *player, std::string &msg, uint32 type)
                 log_str.append(",");
             }
         }
- 
+
         log_str.erase(log_str.length() - 1);
         log_str.append("] ");
     }
- 
+
     log_str.append(msg);
- 
+
     log_str.append("\n");
- 
+
     if (screenflag[CHAT_LOG_BATTLEGROUND]) printf("%s", log_str.c_str());
     if (files[CHAT_LOG_BATTLEGROUND])
     {
@@ -536,19 +536,19 @@ void ChatLog::BattleGroundMsg(Player *player, std::string &msg, uint32 type)
         fflush(files[CHAT_LOG_BATTLEGROUND]);
     }
 }
- 
+
 void ChatLog::OpenAllFiles()
 {
     std::string tempname;
     char dstr[12];
- 
+
     if (ChatLogDateSplit)
     {
         time_t t = time(NULL);
         tm* aTm = localtime(&t);
         sprintf(dstr, "%-4d-%02d-%02d", aTm->tm_year + 1900, aTm->tm_mon + 1, aTm->tm_mday);
     }
- 
+
     if (ChatLogEnable)
     {
         for (int i = 0; i <= CHATLOG_CHAT_TYPES_COUNT - 1; i++)
@@ -581,7 +581,7 @@ void ChatLog::OpenAllFiles()
             }
         }
     }
- 
+
     // initialize innormative log
     if (LexicsCutterEnable)
     {
@@ -602,7 +602,7 @@ void ChatLog::OpenAllFiles()
         }
     }
 }
- 
+
 void ChatLog::CloseAllFiles()
 {
     for (int i = 0; i <= CHATLOG_CHAT_TYPES_COUNT - 1; i++)
@@ -613,19 +613,19 @@ void ChatLog::CloseAllFiles()
             {
                 if (files[j] == files[i]) files[j] = NULL;
             }
- 
+
             fclose(files[i]);
             files[i] = NULL;
         }
     }
- 
+
     if (f_innormative)
     {
         fclose(f_innormative);
         f_innormative = NULL;
     }
 }
- 
+
 void ChatLog::CheckDateSwitch()
 {
     if (ChatLogDateSplit)
@@ -641,14 +641,14 @@ void ChatLog::CheckDateSwitch()
         }
     }
 }
- 
+
 void ChatLog::WriteInitStamps()
 {
     // remember date
     time_t t = time(NULL);
     tm* aTm = localtime(&t);
     lastday = aTm->tm_mday;
- 
+
     if (files[CHAT_LOG_CHAT])
     {
         OutTimestamp(files[CHAT_LOG_CHAT]);
@@ -679,34 +679,34 @@ void ChatLog::WriteInitStamps()
         OutTimestamp(files[CHAT_LOG_RAID]);
         fprintf(files[CHAT_LOG_RAID], "%s", "[SYSTEM] Raid Party Chat Log Initialized\n");
     }
- 
+
     if (f_innormative)
     {
         OutTimestamp(f_innormative);
         fprintf(f_innormative, "%s", "[SYSTEM] Innormative Lexics Log Initialized\n");
     }
 }
- 
+
 void ChatLog::OutTimestamp(FILE* file)
 {
     time_t t = time(NULL);
     tm* aTm = localtime(&t);
     fprintf(file, "%-4d-%02d-%02d %02d:%02d:%02d ", aTm->tm_year + 1900, aTm->tm_mon + 1, aTm->tm_mday, aTm->tm_hour, aTm->tm_min, aTm->tm_sec);
 }
- 
+
 void ChatLog::ChatBadLexicsAction(Player* player, std::string& msg)
 {
     // logging
     std::string log_str = "";
- 
+
     log_str.append("[");
     log_str.append(player->GetName());
     log_str.append("] ");
- 
+
     log_str.append(msg);
- 
+
     log_str.append("\n");
- 
+
     if (LexicsCutterScreenLog) printf("<INNORMATIVE!> %s", log_str.c_str());
     if (f_innormative)
     {
@@ -714,20 +714,20 @@ void ChatLog::ChatBadLexicsAction(Player* player, std::string& msg)
         fprintf(f_innormative, "%s", log_str.c_str());
         fflush(f_innormative);
     }
- 
+
     // cutting innormative lexics
     if (LexicsCutterInnormativeCut)
     {
         msg = LexicsCutterCutReplacement;
     }
- 
+
     if (!player || !player->GetSession()) return;
- 
+
     if (LexicsCutterNoActionOnGM && player->GetSession()->GetSecurity()) return;
- 
+
     // special action
     const SpellEntry* sl;
- 
+
     switch (LexicsCutterAction)
     {
         case LEXICS_ACTION_SHEEP:
@@ -748,7 +748,7 @@ void ChatLog::ChatBadLexicsAction(Player* player, std::string& msg)
             }
         }
         break;
- 
+
         case LEXICS_ACTION_STUN:
         {
             // stunned surprised
@@ -767,21 +767,21 @@ void ChatLog::ChatBadLexicsAction(Player* player, std::string& msg)
             }
         }
         break;
- 
+
         case LEXICS_ACTION_DIE:
         {
             // oops, kicked the bucket
             player->DealDamage(player, player->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
         }
         break;
- 
+
         case LEXICS_ACTION_DRAIN:
         {
             // living corpse :)
             player->DealDamage(player, player->GetHealth() - 5, NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
         }
         break;
- 
+
         case LEXICS_ACTION_SILENCE:
         {
             // glue the mouth
@@ -789,7 +789,7 @@ void ChatLog::ChatBadLexicsAction(Player* player, std::string& msg)
             player->GetSession()->m_muteTime = mutetime;
         }
         break;
- 
+
         case LEXICS_ACTION_STUCK:
         {
             // yo, the Matrix has had you :) [by KAPATEJIb]
@@ -808,7 +808,7 @@ void ChatLog::ChatBadLexicsAction(Player* player, std::string& msg)
             }
         }
         break;
- 
+
         case LEXICS_ACTION_SICKNESS:
         {
             // for absence of censorship, there is punishment [by Koshei]
@@ -827,7 +827,7 @@ void ChatLog::ChatBadLexicsAction(Player* player, std::string& msg)
             }
         }
         break;
- 
+
         case LEXICS_ACTION_SHEAR:
         {
             // Lord Illidan to watch you [by Koshei]
@@ -846,7 +846,7 @@ void ChatLog::ChatBadLexicsAction(Player* player, std::string& msg)
             }
         }
         break;
- 
+
         default:
         // no action except logging
         break;

@@ -635,6 +635,14 @@ void World::LoadConfigSettings(bool reload)
     m_configBoolValues[CONFIG_BOOL_ALLOW_TWO_SIDE_INTERACTION_MAIL]    = sConfig.GetBoolDefault("AllowTwoSide.Interaction.Mail",false);
     m_configBoolValues[CONFIG_BOOL_ALLOW_TWO_SIDE_WHO_LIST]            = sConfig.GetBoolDefault("AllowTwoSide.WhoList", false);
     m_configBoolValues[CONFIG_BOOL_ALLOW_TWO_SIDE_ADD_FRIEND]          = sConfig.GetBoolDefault("AllowTwoSide.AddFriend", false);
+	
+	//Monkey
+	m_configBoolValues[CONFIG_BOOL_INTERFACTION]   = sConfig.GetBoolDefault("Interfaction", false);
+	if(m_configBoolValues[CONFIG_BOOL_INTERFACTION]) {
+		sLog.outString( "Interfaction Autorise" );
+	}
+	//Monkey
+	
 
     m_configUint32Values[CONFIG_UINT32_STRICT_PLAYER_NAMES]                = sConfig.GetIntDefault ("StrictPlayerNames",  0);
     m_configUint32Values[CONFIG_UINT32_STRICT_CHARTER_NAMES]               = sConfig.GetIntDefault ("StrictCharterNames", 0);

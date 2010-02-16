@@ -15,19 +15,20 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
- 
+
 #include "Common.h"
 #include "ChatLexicsCutter.h"
- 
+#include "Log.h"
+
 LexicsCutter::LexicsCutter()
 {
     InvalidChars = "~`!@#$%^&*()-_+=[{]}|\\;:'\",<.>/?";
 }
- 
+
 bool LexicsCutter::ReadUTF8(std::string& in, std::string& out, unsigned int& pos)
 {
     if (pos >= in.length()) return false;
- 
+
     out = "";
     unsigned char c = in[pos++];
     out += c;
@@ -37,16 +38,16 @@ bool LexicsCutter::ReadUTF8(std::string& in, std::string& out, unsigned int& pos
         out += in[pos++];
         toread--;
     }
- 
+
     return true;
 }
- 
+
 std::string LexicsCutter::trim(std::string& s, const std::string& drop)
 {
     std::string r = s.erase(s.find_last_not_of(drop) + 1);
     return r.erase(0, r.find_first_not_of(drop));
 }
- 
+
 bool LexicsCutter::Read_Letter_Analogs(std::string& FileName)
 {
     FILE *ma_file;
@@ -55,14 +56,20 @@ bool LexicsCutter::Read_Letter_Analogs(std::string& FileName)
     std::string line_s;
     std::string lchar;
     std::string lanalog;
- 
+
     ma_file = fopen(FileName.c_str(), "rb");
- 
+
+    if (!ma_file)
+    {
+        sLog.outError("Chat lexics cutter disabled. Reason: LexicsCutterAnalogsFile file does not exist in the server directory.");
+        return false;
+    }
+
     while (!feof(ma_file))
     {
         line[0] = 0x0;
         fgets(line, 1020, ma_file);
- 
+
         // check for UTF8 prefix and comments
         if (strlen(line) >= 3)
         {
@@ -71,21 +78,21 @@ bool LexicsCutter::Read_Letter_Analogs(std::string& FileName)
                 strncpy(&line[0], &line[3], strlen(line) - 3);
             }
         }
- 
+
         if (strlen(line) >= 2)
         {
             if (line[0] == '/' && line[1] == '/') continue;
         }
- 
+
         // check for empty string
         line_s = line;
         line_s = trim(line_s, "\x0A\x0D\x20");
         if (line_s == "") continue;
- 
+
         // process line without CR/LF
         line_s = line;
         line_s = trim(line_s, "\x0A\x0D");
- 
+
         pos = 0;
         if (ReadUTF8(line_s, lchar, pos))
         {
@@ -95,17 +102,17 @@ bool LexicsCutter::Read_Letter_Analogs(std::string& FileName)
             {
                 av.push_back(lanalog);
             }
- 
+
             // store vector in hash map
             AnalogMap[lchar] = av;
         }
     }
- 
+
     fclose(ma_file);
- 
+
     return true;
 }
- 
+
 bool LexicsCutter::Read_Innormative_Words(std::string& FileName)
 {
     FILE *ma_file;
@@ -113,14 +120,20 @@ bool LexicsCutter::Read_Innormative_Words(std::string& FileName)
     unsigned int pos;
     std::string line_s;
     std::string lchar;
- 
+
     ma_file = fopen(FileName.c_str(), "rb");
- 
+
+    if (!ma_file)
+    {
+        sLog.outError("Chat lexics cutter disabled. Reason: LexicsCutterWordsFile file does not exist in the server directory.");
+        return false;
+    }
+
     while (!feof(ma_file))
     {
         line[0] = 0x0;
         fgets(line, 1020, ma_file);
- 
+
         // check for UTF8 prefix and comment
         if (strlen(line) >= 3)
         {
@@ -129,21 +142,21 @@ bool LexicsCutter::Read_Innormative_Words(std::string& FileName)
                 strncpy(&line[0], &line[3], strlen(line) - 3);
             }
         }
- 
+
         if (strlen(line) >= 2)
         {
             if (line[0] == '/' && line[1] == '/') continue;
         }
- 
+
         // check for empty string
         line_s = line;
         line_s = trim(line_s, "\x0A\x0D\x20");
         if (line_s == "") continue;
- 
+
         // process line without CR/LF
         line_s = line;
         line_s = trim(line_s, "\x0A\x0D");
- 
+
         // create word vector of vectors
         LC_WordVector vw;
         pos = 0;
@@ -151,10 +164,10 @@ bool LexicsCutter::Read_Innormative_Words(std::string& FileName)
         {
             // create letter set
             LC_LetterSet vl;
- 
+
             // initialize letter set with letter read
             vl.insert(lchar);
- 
+
             // find letter analogs and push them onto the vector
             LC_AnalogMap::iterator itr = AnalogMap.find(lchar);
             if (itr != AnalogMap.end())
@@ -165,20 +178,20 @@ bool LexicsCutter::Read_Innormative_Words(std::string& FileName)
                     vl.insert(*itr2);
                 }
             }
- 
+
             // add letter vector to word vector
             vw.push_back(vl);
         }
- 
+
         // push new word to words list
         WordList.push_back(vw);
     }
- 
+
     fclose(ma_file);
- 
+
     return true;
 }
- 
+
 void LexicsCutter::Map_Innormative_Words()
 {
     // process all the words in the vector
@@ -192,15 +205,15 @@ void LexicsCutter::Map_Innormative_Words()
         }
     }
 }
- 
+
 bool LexicsCutter::Compare_Word(std::string& str, unsigned int pos, LC_WordVector word)
 {
    std::string lchar_prev;
     std::string lchar;
- 
+
    // read first letter of the word into lchar_prev
    ReadUTF8(str, lchar, pos);
- 
+
     // okay, here we go, comparing word
     // first letter is already okay, we do begin from second and go on
     LC_WordVector::iterator i = word.begin();
@@ -229,18 +242,18 @@ bool LexicsCutter::Compare_Word(std::string& str, unsigned int pos, LC_WordVecto
        // set previous string letter to compare if needed (this check can really conserve time)
        if (IgnoreLetterRepeat) lchar_prev = lchar;
    }
- 
+
     return(true);
 }
- 
+
 bool LexicsCutter::Check_Lexics(std::string& Phrase)
 {
     std::string lchar;
     LC_WordMap::iterator i;
     std::pair< LC_WordMap::iterator, LC_WordMap::iterator > ii;
- 
+
     if (Phrase.size() == 0) return(false);
- 
+
     // first, convert the string, adding spaces and removing invalid characters
     // also create fast position vector for the new positions
     std::string str = " ";
@@ -252,7 +265,7 @@ bool LexicsCutter::Check_Lexics(std::string& Phrase)
             str.append(lchar);
         }
     }
- 
+
     // string prepared, now parse it and scan for all the words
    unsigned int pos_prev = 0;
     pos = 0;
@@ -269,6 +282,6 @@ bool LexicsCutter::Check_Lexics(std::string& Phrase)
        // set initial position to the current position
        pos_prev = pos;
     }
- 
+
     return(false);
 }

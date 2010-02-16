@@ -15,17 +15,17 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
- 
+
 #ifndef MANGOSSERVER_CHATLEXICSCUTTER_H
 #define MANGOSSERVER_CHATLEXICSCUTTER_H
- 
+
 typedef std::vector< std::string > LC_AnalogVector;
 typedef std::map< std::string, LC_AnalogVector > LC_AnalogMap;
 typedef std::set< std::string > LC_LetterSet;
 typedef std::vector< LC_LetterSet > LC_WordVector;
 typedef std::vector< LC_WordVector > LC_WordList;
 typedef std::multimap< std::string, unsigned int > LC_WordMap;
- 
+
 static int trailingBytesForUTF8[256] = {
     0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -36,31 +36,31 @@ static int trailingBytesForUTF8[256] = {
     1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
     2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2, 3,3,3,3,3,3,3,3,4,4,4,4,5,5,5,5
 };
- 
+
 class LexicsCutter
 {
     protected:
         LC_AnalogMap AnalogMap;
         LC_WordList WordList;
         LC_WordMap WordMap;
- 
+
         std::string InvalidChars;
- 
+
     public:
         LexicsCutter();
- 
+
         static bool ReadUTF8(std::string& in, std::string& out, unsigned int& pos);
- 
+
         std::string trim(std::string& s, const std::string& drop = " ");
         bool Read_Letter_Analogs(std::string& FileName);
         bool Read_Innormative_Words(std::string& FileName);
         void Map_Innormative_Words();
         bool Compare_Word(std::string& str, unsigned int pos, LC_WordVector word);
         bool Check_Lexics(std::string& Phrase);
- 
+
         std::vector< std::pair< unsigned int, unsigned int > > Found;
         bool IgnoreMiddleSpaces;
         bool IgnoreLetterRepeat;
 };
- 
+
 #endif
