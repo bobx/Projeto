@@ -804,9 +804,9 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
 		sWorld.SendWorldText(LANG_GMLOGIN_SYS, pCurrChar->GetName());
 		break;
 		}
-		sLog.outBasic("MJ '%s' connectÃ© et annoncÃ©",pCurrChar->GetName());
+		sLog.outBasic("MJ '%s' connecté et annoncé",pCurrChar->GetName());
 		}
-		else sLog.outBasic("Pas annoncÃ© xD");
+		else sLog.outBasic("Pas annoncé xD");
 	}
 
     std::string IP_str = GetRemoteAddress();

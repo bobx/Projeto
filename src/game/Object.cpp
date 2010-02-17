@@ -1896,7 +1896,7 @@ void WorldObject::GetNearPoint(WorldObject const* searcher, float &x, float &y, 
     bool localDebug = false;
     uint32 localCounter = 0;
     uint32 localCounter2 = 0;
-
+	
     // select in positions after current nodes (selection one by one)
     while(selector.NextAngle(angle))                        // angle for free pos
     {
@@ -1927,7 +1927,7 @@ void WorldObject::GetNearPoint(WorldObject const* searcher, float &x, float &y, 
     if(!first_los_conflict)
     {
 		if(localDebug) sLog.outError("WorldObject::GetNearPoint: CHECKPOINT 1A (angle = %f, map_id = %u, x = %f, y = %f, z = %f)", angle, GetMapId(), x, y, z);
-        
+ 
         x = first_x;
         y = first_y;
 
@@ -1936,7 +1936,7 @@ void WorldObject::GetNearPoint(WorldObject const* searcher, float &x, float &y, 
 		if(localDebug) sLog.outError("WorldObject::GetNearPoint: RETURN POINT 1 (angle = %f, map_id = %u, x = %f, y = %f, z = %f)", angle, GetMapId(), x, y, z);
         return;
     }
-
+	
 	if(localDebug) sLog.outError("WorldObject::GetNearPoint: CHECKPOINT 2 (angle = %f, map_id = %u, x = %f, y = %f, z = %f)", angle, GetMapId(), x, y, z);
 
     // special case when one from list empty and then empty side preferred

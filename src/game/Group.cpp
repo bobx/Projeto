@@ -1715,4 +1715,3 @@ void Group::BroadcastGroupUpdate(void)
 	}
 }
 // Monkey
-

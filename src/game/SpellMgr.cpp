@@ -1340,7 +1340,7 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
             {
                 case SPELLFAMILY_GENERIC:                   // same family case
                 {
-                    // Eye of Acherus
+				    // Eye of Acherus
                     if ((spellInfo_1->Id == 51890 && spellInfo_2->Id == 51852) ||
                         (spellInfo_2->Id == 51852 && spellInfo_1->Id == 51890))
                         return false;
@@ -1349,7 +1349,7 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
                     if ((spellInfo_1->Id == 51890 && spellInfo_2->Id == 51923) ||
                         (spellInfo_2->Id == 51923 && spellInfo_1->Id == 51890))
                         return false;
-
+						
                     // Thunderfury
                     if ((spellInfo_1->Id == 21992 && spellInfo_2->Id == 27648) ||
                         (spellInfo_2->Id == 21992 && spellInfo_1->Id == 27648))

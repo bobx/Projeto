@@ -125,7 +125,7 @@ bool ObjectPosSelector::NextUsedAngle(float& angle)
             break;
         }
     }
-
+	
 	if(localDebug) sLog.outError("ObjectPosSelector::NextUsedAngle: RETURN POINT 2 (angle = %f)", angle);
 
     return false;

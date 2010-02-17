@@ -2116,7 +2116,7 @@ bool ChatHandler::HandleModifyPhaseCommand(const char* args)
 bool ChatHandler::HandlePInfoCommand(const char* args)
 {
     Player* target;
-	char* py = NULL;
+	 char* py = NULL;
     uint64 target_guid;
     std::string target_name;
     if(!extractPlayerTarget((char*)args,&target,&target_guid,&target_name))
@@ -2127,7 +2127,7 @@ bool ChatHandler::HandlePInfoCommand(const char* args)
     uint32 total_player_time = 0;
     uint32 level = 0;
     uint32 latency = 0;
-	uint32 realmID = sConfig.GetIntDefault("RealmId", 0);
+	 uint32 realmID = sConfig.GetIntDefault("RealmId", 0);
 
     // get additional information from Player object
     if(target)
@@ -2204,7 +2204,6 @@ bool ChatHandler::HandlePInfoCommand(const char* args)
     uint32 silv = (money % GOLD) / SILVER;
     uint32 copp = (money % GOLD) % SILVER;
     PSendSysMessage(LANG_PINFO_LEVEL,  timeStr.c_str(), level, gold,silv,copp );
-
 	if (py && strncmp(py, "jail", 4) == 0)
     {
         if (target->m_jail_times > 0)

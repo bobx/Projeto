@@ -292,7 +292,7 @@ void WorldSession::HandleMessagechatOpcode( WorldPacket & recv_data )
                 break;
 
 			sChatLog.GuildMsg(GetPlayer(), msg, false);
-			
+
             if (GetPlayer()->GetGuildId())
                 if (Guild *guild = sObjectMgr.GetGuildById(GetPlayer()->GetGuildId()))
                     guild->BroadcastToGuild(this, msg, lang == LANG_ADDON ? LANG_ADDON : LANG_UNIVERSAL);
@@ -314,9 +314,9 @@ void WorldSession::HandleMessagechatOpcode( WorldPacket & recv_data )
 
             if(msg.empty())
                 break;
-
+				
 			sChatLog.GuildMsg(GetPlayer(), msg, true);
-			
+
             if (GetPlayer()->GetGuildId())
                 if (Guild *guild = sObjectMgr.GetGuildById(GetPlayer()->GetGuildId()))
                     guild->BroadcastToOfficers(this, msg, lang == LANG_ADDON ? LANG_ADDON : LANG_UNIVERSAL);
@@ -393,9 +393,9 @@ void WorldSession::HandleMessagechatOpcode( WorldPacket & recv_data )
 
             if(msg.empty())
                 break;
-
+				
 			sChatLog.RaidMsg(GetPlayer(), msg, type);
-			
+
             Group *group = GetPlayer()->GetGroup();
             if(!group || !group->isRaidGroup() || !(group->IsLeader(GetPlayer()->GetGUID()) || group->IsAssistant(GetPlayer()->GetGUID())))
                 return;
@@ -417,9 +417,8 @@ void WorldSession::HandleMessagechatOpcode( WorldPacket & recv_data )
             if(msg.empty())
                 break;
 
-            //battleground raid is always in Player->GetGroup(), never in GetOriginalGroup()
+            // battleground raid is always in Player->GetGroup(), never in GetOriginalGroup()
 			sChatLog.BattleGroundMsg(GetPlayer(), msg, type);
-			
             Group *group = GetPlayer()->GetGroup();
             if(!group || !group->isBGGroup())
                 return;
@@ -440,10 +439,9 @@ void WorldSession::HandleMessagechatOpcode( WorldPacket & recv_data )
             if(msg.empty())
                 break;
 
-            //battleground raid is always in Player->GetGroup(), never in GetOriginalGroup()
+            // battleground raid is always in Player->GetGroup(), never in GetOriginalGroup()
             sChatLog.BattleGroundMsg(GetPlayer(), msg, type);
-			Group *group = GetPlayer()->GetGroup();
-
+			 Group *group = GetPlayer()->GetGroup();
             if(!group || !group->isBGGroup() || !group->IsLeader(GetPlayer()->GetGUID()))
                 return;
 
@@ -465,7 +463,7 @@ void WorldSession::HandleMessagechatOpcode( WorldPacket & recv_data )
                 break;
 
 			sChatLog.ChannelMsg(GetPlayer(), channel, msg);
-			
+	
             if(ChannelMgr* cMgr = channelMgr(_player->GetTeam()))
                 if(Channel *chn = cMgr->GetChannel(channel, _player))
                     chn->Say(_player->GetGUID(), msg.c_str(), lang);

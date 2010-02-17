@@ -60,7 +60,7 @@ bool ChatHandler::HandleJailReloadCommand(const char* arg)
      SendSysMessage(LANG_JAIL_RELOAD);
      return true;
  }
- 
+
 bool ChatHandler::HandleReloadAllCommand(const char*)
 {
     HandleReloadSkillFishingBaseLevelCommand("");

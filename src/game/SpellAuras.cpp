@@ -4725,7 +4725,7 @@ void Aura::HandlePeriodicDamage(bool apply, bool Real)
               }
          }
     }
-		
+
         if (!caster)
             return;
 

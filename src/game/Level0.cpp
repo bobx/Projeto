@@ -62,7 +62,7 @@ bool ChatHandler::HandleAccountCommand(const char* /*args*/)
 }
 
 bool ChatHandler::HandleStartCommand(const char* /*args*/)
-{   
+{
 	// Jail by WarHead
     if (m_session->GetPlayer()->m_jail_isjailed)
     {

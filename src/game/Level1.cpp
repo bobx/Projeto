@@ -2139,7 +2139,7 @@ bool ChatHandler::HandleJailCommand(const char *args)
     chr->m_jail_char = fields[3].GetCppString();
     chr->m_jail_isjailed = true;
     chr->m_jail_release = localtime + (jailtime * 60 * 60);
-	chr->m_jail_amnestietime = localtime +(60* 60 * 24 * sObjectMgr.m_jailconf_amnestie);
+	 chr->m_jail_amnestietime = localtime +(60* 60 * 24 * sObjectMgr.m_jailconf_amnestie);
     chr->m_jail_reason = jailreason;
     chr->m_jail_times = chr->m_jail_times+1;
     chr->m_jail_gmacc = m_session->GetAccountId();

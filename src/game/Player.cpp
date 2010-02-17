@@ -1,4 +1,3 @@
-
 /*
  * Copyright (C) 2005-2010 MaNGOS <http://getmangos.com/>
  *
@@ -1130,7 +1129,7 @@ void Player::Update( uint32 p_time )
     SetCanDelayTeleport(true);
     Unit::Update( p_time );
     SetCanDelayTeleport(false);
-
+	
 	if (m_jail_isjailed)
     {
         time_t localtime;
@@ -15288,9 +15287,9 @@ bool Player::LoadFromDB( uint32 guid, SqlQueryHolder *holder )
 
     _LoadDeclinedNames(holder->GetResult(PLAYER_LOGIN_QUERY_LOADDECLINEDNAMES));
 
-	m_achievementMgr.LoadFromDB(holder->GetResult(PLAYER_LOGIN_QUERY_LOADACHIEVEMENTS), holder->GetResult(PLAYER_LOGIN_QUERY_LOADCRITERIAPROGRESS));
+    m_achievementMgr.LoadFromDB(holder->GetResult(PLAYER_LOGIN_QUERY_LOADACHIEVEMENTS), holder->GetResult(PLAYER_LOGIN_QUERY_LOADCRITERIAPROGRESS));
     m_achievementMgr.CheckAllAchievementCriteria();
-    
+
     _LoadEquipmentSets(holder->GetResult(PLAYER_LOGIN_QUERY_LOADEQUIPMENTSETS));
    // Loads the jail datas and if jailed it corrects the position to the corresponding jail
     _LoadJail();
@@ -16318,7 +16317,6 @@ void Player::_SaveJail(void)
 
     if (result) delete result;
 }
-
 
 void Player::SaveToDB()
 {

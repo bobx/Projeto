@@ -152,7 +152,7 @@ ObjectAccessor::SaveAllPlayers()
 	{
         if (itr->second->m_jail_isjailed) continue; // Prevent jailed players to be saved
         itr->second->SaveToDB();
-    }   
+    } 
 }
 
 void ObjectAccessor::KickPlayer(uint64 guid)
