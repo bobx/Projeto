@@ -2066,4 +2066,3 @@ void Creature::SendAreaSpiritHealerQueryOpcode(Player *pl)
     data << GetGUID() << next_resurrect;
     pl->SendDirectMessage(&data);
 }
-

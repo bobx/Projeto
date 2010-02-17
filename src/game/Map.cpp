@@ -909,9 +909,9 @@ Map::CreatureRelocation(Creature *creature, float x, float y, float z, float ang
         if(creature->isCharmed())
 	{
             NGridType* oldGrid = getNGrid(old_cell.GridX(), old_cell.GridY());
-            RemoveFromGrid(creature->GetCharmerOrOwnerPlayerOrPlayerItself(), oldGrid,old_cell);
-            if( !old_cell.DiffGrid(new_cell) )
-                AddToGrid(creature->GetCharmerOrOwnerPlayerOrPlayerItself(), oldGrid,new_cell);
+            RemoveFromGrid(creature->GetCharmerOrOwnerPlayerOrPlayerItself(), oldGrid, old_cell);
+            if(!old_cell.DiffGrid(new_cell))
+                AddToGrid(creature->GetCharmerOrOwnerPlayerOrPlayerItself(), oldGrid, new_cell);
             else
                 EnsureGridLoadedAtEnter(new_cell, creature->GetCharmerOrOwnerPlayerOrPlayerItself());
 	}
@@ -922,9 +922,9 @@ Map::CreatureRelocation(Creature *creature, float x, float y, float z, float ang
         CreatureRelocationNotify(creature, new_cell, new_val);
         if(creature->isCharmed())
         {
-            UpdatePlayerVisibility(creature->GetCharmerOrOwnerPlayerOrPlayerItself(),new_cell,new_val);
-            UpdateObjectsVisibilityFor(creature->GetCharmerOrOwnerPlayerOrPlayerItself(),new_cell,new_val);
-            PlayerRelocationNotify(creature->GetCharmerOrOwnerPlayerOrPlayerItself(),new_cell,new_val);
+            UpdatePlayerVisibility(creature->GetCharmerOrOwnerPlayerOrPlayerItself(), new_cell, new_val);
+            UpdateObjectsVisibilityFor(creature->GetCharmerOrOwnerPlayerOrPlayerItself(), new_cell, new_val);
+            PlayerRelocationNotify(creature->GetCharmerOrOwnerPlayerOrPlayerItself(), new_cell, new_val);
 
             bool same_cell = (new_cell == old_cell);
             NGridType* newGrid = getNGrid(new_cell.GridX(), new_cell.GridY());
