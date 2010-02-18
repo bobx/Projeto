@@ -1099,6 +1099,7 @@ void MailDraft::SendMailTo(MailReceiver const& receiver, MailSender const& sende
         deleteIncludedItems();
 }
 /*! @} */
+
 void WorldSession::SendExternalMails()
 {
     sLog.outString("EXTERNAL MAIL> Send Mails from Queue...");
