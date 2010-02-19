@@ -267,7 +267,7 @@ void WorldSession::HandleLogoutRequestOpcode( WorldPacket & /*recv_data*/ )
     //Can not logout if...
     if( GetPlayer()->isInCombat() ||                        //...is in combat
         GetPlayer()->duel         ||                        //...is in Duel
-		GetPlayer()->HasAura(9454,0)         ||             //...is frozen by GM
+		 GetPlayer() -> HasAura( 9454, SpellEffectIndex( 0 ))         ||             //...is frozen by GM
                                                             //...is jumping ...is falling
         GetPlayer()->m_movementInfo.HasMovementFlag(MovementFlags(MOVEFLAG_FALLING | MOVEFLAG_FALLINGFAR)))
     {
@@ -305,7 +305,7 @@ void WorldSession::HandleLogoutRequestOpcode( WorldPacket & /*recv_data*/ )
 		sWorld.SendWorldText(LANG_GMLOGOUT_SYS, GetPlayer()->GetName());
 		break;
 		}
-		sLog.outBasic("MJ '%s' dÃ©connectÃ© et annoncÃ©",GetPlayer()->GetName());
+		sLog.outBasic("MJ '%s' dÃƒÂ©connectÃƒÂ© et annoncÃƒÂ©",GetPlayer()->GetName());
 		}
         LogoutPlayer(true);
         return;

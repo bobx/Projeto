@@ -738,7 +738,7 @@ void ChatLog::ChatBadLexicsAction(Player* player, std::string& msg)
             {
                 for (int i = 0; i < 3; i++)
                 {
-                    Aura* Aur = CreateAura(sl, i, NULL, player);
+                    Aura* Aur = CreateAura(sl, SpellEffectIndex(i), NULL, player);
                     if (Aur)
                     {
                         Aur->SetAuraDuration(LexicsCutterActionDuration);
@@ -757,7 +757,7 @@ void ChatLog::ChatBadLexicsAction(Player* player, std::string& msg)
             {
                 for (int i = 0; i < 3; i++)
                 {
-                    Aura* Aur = CreateAura(sl, i, NULL, player);
+                    Aura* Aur = CreateAura(sl, SpellEffectIndex(i), NULL, player);
                     if (Aur)
                     {
                         Aur->SetAuraDuration(LexicsCutterActionDuration);
@@ -798,7 +798,7 @@ void ChatLog::ChatBadLexicsAction(Player* player, std::string& msg)
             {
                 for (int i = 0; i < 3; i++)
                 {
-                    Aura* Aur = CreateAura(sl, i, NULL, player);
+                    Aura* Aur = CreateAura(sl, SpellEffectIndex(i), NULL, player);
                     if (Aur)
                     {
                         Aur->SetAuraDuration(LexicsCutterActionDuration);
@@ -817,7 +817,7 @@ void ChatLog::ChatBadLexicsAction(Player* player, std::string& msg)
             {
                 for (int i = 0; i < 3; i++)
                 {
-                    Aura* Aur = CreateAura(sl, i, NULL, player);
+                    Aura* Aur = CreateAura(sl, SpellEffectIndex(i), NULL, player);
                     if (Aur)
                     {
                         Aur->SetAuraDuration(LexicsCutterActionDuration);
@@ -836,7 +836,7 @@ void ChatLog::ChatBadLexicsAction(Player* player, std::string& msg)
             {
                 for (int i = 0; i < 3; i++)
                 {
-                    Aura* Aur = CreateAura(sl, i, NULL, player);
+                    Aura* Aur = CreateAura(sl, SpellEffectIndex(i), NULL, player);
                     if (Aur)
                     {
                         Aur->SetAuraDuration(LexicsCutterActionDuration);

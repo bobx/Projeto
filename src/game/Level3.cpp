@@ -6538,7 +6538,7 @@ bool ChatHandler::HandleFreezeCommand(const char *args)
                     eff == SPELL_EFFECT_PERSISTENT_AREA_AURA || eff == SPELL_EFFECT_APPLY_AREA_AURA_FRIEND || 
                     eff == SPELL_EFFECT_APPLY_AREA_AURA_ENEMY)
                 {
-                    Aura *Aur = CreateAura(spellInfo, i, NULL, player);
+                    Aura *Aur = CreateAura(spellInfo, SpellEffectIndex(i), NULL, player);
                     player->AddAura(Aur);
                 }
             }
