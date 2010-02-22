@@ -873,7 +873,7 @@ struct GlyphSlotEntry
 };
 
 // All Gt* DBC store data for 100 levels, some by 100 per class/race
-#define GT_MAX_LEVEL    255
+#define GT_MAX_LEVEL    100
 
 struct GtBarberShopCostBaseEntry
 {
