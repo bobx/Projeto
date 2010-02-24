@@ -1155,6 +1155,23 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     return;
                 }
                 */
+                case 43882:                                 // Scourging Crystal Controller Dummy
+                {
+                    if (!unitTarget || unitTarget->GetTypeId() != TYPEID_UNIT)
+                        return;
+
+                    // see spell dummy 50133
+                    unitTarget->RemoveAurasDueToSpell(43874);
+                    return;
+                }
+                case 44454:                                 // Tasty Reef Fish
+                {
+                    if (!unitTarget || unitTarget->GetTypeId() != TYPEID_UNIT)
+                        return;
+
+                    m_caster->CastSpell(unitTarget, 44455, true, m_CastItem);
+                    return;
+                }
                 case 44875:                                 // Complete Raptor Capture
                 {
                     if (!unitTarget || unitTarget->GetTypeId() != TYPEID_UNIT)
@@ -1307,6 +1324,22 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     }
                     return;
                 }
+                case 50133:                                 // Scourging Crystal Controller
+                {
+                    if (!unitTarget || unitTarget->GetTypeId() != TYPEID_UNIT)
+                        return;
+
+                    if (unitTarget->HasAura(43874))
+                    {
+                        // someone else is already channeling target
+                        if (unitTarget->HasAura(43878))
+                            return;
+
+                        m_caster->CastSpell(unitTarget, 43878, true, m_CastItem);
+                    }
+
+                    return;
+                }
                 case 50243:                                 // Teach Language
                 {
                     if (m_caster->GetTypeId() != TYPEID_PLAYER)
@@ -1413,6 +1446,16 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                         m_caster->CastSpell(m_caster, 54861, true, m_CastItem);
                     else                                    // Knocked Up   - backfire 5%
                         m_caster->CastSpell(m_caster, 46014, true, m_CastItem);
+
+                    return;
+                }
+                case 55818:                                 // Hurl Boulder
+                {
+                    // unclear how many summon min/max random, best guess below
+                    uint32 random = urand(3,5);
+
+                    for(uint32 i = 0; i < random; ++i)
+                        m_caster->CastSpell(m_caster, 55528, true);
 
                     return;
                 }
@@ -5386,6 +5429,39 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
 
                     unitTarget->CastSpell(unitTarget, 41131, true);
                     break;
+                }
+                case 44455:                                 // Character Script Effect Reverse Cast
+                {
+                    if (!unitTarget || unitTarget->GetTypeId() != TYPEID_UNIT)
+                        return;
+
+                    Creature* pTarget = (Creature*)unitTarget;
+
+                    if (const SpellEntry *pSpell = sSpellStore.LookupEntry(m_spellInfo->CalculateSimpleValue(eff_idx)))
+                    {
+                        // if we used item at least once...
+                        if (pTarget->isTemporarySummon() && pTarget->GetEntry() == pSpell->EffectMiscValue[eff_idx])
+                        {
+                            TemporarySummon* pSummon = (TemporarySummon*)pTarget;
+
+                            // can only affect "own" summoned
+                            if (pSummon->GetSummonerGUID() == m_caster->GetGUID())
+                            {
+                                if (pTarget->hasUnitState(UNIT_STAT_ROAMING | UNIT_STAT_ROAMING_MOVE))
+                                    pTarget->GetMotionMaster()->MovementExpired();
+
+                                pTarget->GetMotionMaster()->MovePoint(0, m_caster->GetPositionX(), m_caster->GetPositionY(), m_caster->GetPositionZ());
+                            }
+
+                            return;
+                        }
+
+                        // or if we are first time used item
+                        m_caster->CastSpell(pTarget, pSpell, true);
+                        pTarget->ForcedDespawn();
+                    }
+
+                    return;
                 }
                 case 44876:                                 // Force Cast - Portal Effect: Sunwell Isle
                 {
