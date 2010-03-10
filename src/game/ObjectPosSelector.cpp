@@ -17,6 +17,7 @@
  */
 
 #include "ObjectPosSelector.h"
+#include "Object.h"
 #include "Log.h"
 
 ObjectPosSelector::ObjectPosSelector(float x,float y,float size,float dist)
