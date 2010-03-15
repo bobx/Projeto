@@ -722,7 +722,7 @@ bool Group::CountRollVote(ObjectGuid const& playerGUID, Rolls::iterator& rollI, 
     Roll::PlayerVote::iterator itr = roll->playerVote.find(playerGUID.GetRawValue());
     // this condition means that player joins to the party after roll begins
     if (itr == roll->playerVote.end())
-        return false;
+        return true;                                        // result used for need iterator ++, so avoid for end of list
 
     if (roll->getLoot())
         if (roll->getLoot()->items.empty())
@@ -771,11 +771,10 @@ bool Group::CountRollVote(ObjectGuid const& playerGUID, Rolls::iterator& rollI, 
 //called when roll timer expires
 void Group::EndRoll()
 {
-    Rolls::iterator itr;
     while(!RollId.empty())
     {
         //need more testing here, if rolls disappear
-        itr = RollId.begin();
+        Rolls::iterator itr = RollId.begin();
         CountTheRoll(itr);                                  //i don't have to edit player votes, who didn't vote ... he will pass
     }
 }
@@ -787,7 +786,9 @@ void Group::CountTheRoll(Rolls::iterator& rollI)
     {
         rollI = RollId.erase(rollI);
         delete roll;
+        return;
     }
+
     //end of the roll
     if (roll->totalNeed > 0)
     {
@@ -1256,12 +1257,15 @@ void Group::_setLeader(const uint64 &guid)
 
 void Group::_removeRolls(const uint64 &guid)
 {
-    for (Rolls::iterator it = RollId.begin(); it < RollId.end(); )
+    for (Rolls::iterator it = RollId.begin(); it != RollId.end(); )
     {
         Roll* roll = *it;
         Roll::PlayerVote::iterator itr2 = roll->playerVote.find(guid);
         if(itr2 == roll->playerVote.end())
+        {
+            ++it;
             continue;
+        }
 
         if (itr2->second == GREED || itr2->second == DISENCHANT)
             --roll->totalGreed;
