@@ -43,7 +43,6 @@
 #include <iostream>
 #include <fstream>
 #include <map>
-#include "GlobalEvents.h"
 #include "Config/ConfigEnv.h"
 
 #include "TargetedMovementGenerator.h"                      // for HandleNpcUnFollowCommand
@@ -4247,7 +4246,7 @@ bool ChatHandler::LookupPlayerSearchCommand(QueryResult* result, int32 limit)
 /// Triggering corpses expire check in world
 bool ChatHandler::HandleServerCorpsesCommand(const char* /*args*/)
 {
-    CorpsesErase();
+    sObjectAccessor.RemoveOldCorpses();
     return true;
 }
 
