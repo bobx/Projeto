@@ -3525,6 +3525,17 @@ void Player::removeSpell(uint32 spell_id, bool disabled, bool learn_low_rank, bo
         }
     }
 
+    if (m_canTitanGrip)
+    {
+        SpellEntry const *spellInfo = sSpellStore.LookupEntry(spell_id);
+        if (IsSpellHaveEffect(spellInfo, SPELL_EFFECT_TITAN_GRIP))
+        {
+            m_canTitanGrip = false;
+            if(sWorld.getConfig(CONFIG_BOOL_OFFHAND_CHECK_AT_TALENTS_RESET))
+                AutoUnequipOffhandIfNeed();
+        }
+    }
+
     // remove from spell book if not replaced by lesser rank
     if (!prev_activate && sendUpdate)
     {
@@ -3705,11 +3716,9 @@ bool Player::resetTalents(bool no_cost)
     if(HasAtLoginFlag(AT_LOGIN_RESET_TALENTS))
         RemoveAtLoginFlag(AT_LOGIN_RESET_TALENTS,true);
 
-    uint32 talentPointsForLevel = CalculateTalentsPoints();
-
     if (m_usedTalentCount == 0)
     {
-        SetFreeTalentPoints(talentPointsForLevel);
+        UpdateFreeTalentPoints(false);                      // for fix if need counter
         return false;
     }
 
@@ -3775,7 +3784,7 @@ bool Player::resetTalents(bool no_cost)
         }
     }
 
-    SetFreeTalentPoints(talentPointsForLevel);
+    UpdateFreeTalentPoints(false);
 
     if(!no_cost)
     {
@@ -3796,15 +3805,6 @@ bool Player::resetTalents(bool no_cost)
             RemovePet(NULL,PET_SAVE_NOT_IN_SLOT, true);
     }
     */
-
-
-    if(m_canTitanGrip)
-    {
-        m_canTitanGrip = false;
-        if(sWorld.getConfig(CONFIG_BOOL_OFFHAND_CHECK_AT_TALENTS_RESET))
-            AutoUnequipOffhandIfNeed();
-    }
-
     return true;
 }
 
@@ -21040,6 +21040,7 @@ void Player::LearnTalent(uint32 talentId, uint32 talentRank)
                     if (HasSpell(depTalentInfo->RankID[i]))
                         hasEnoughRank = true;
             }
+
             if (!hasEnoughRank)
                 return;
         }
@@ -21226,9 +21227,6 @@ void Player::LearnPetTalent(uint64 petGuid, uint32 talentId, uint32 talentRank)
     // learn! (other talent ranks will unlearned at learning)
     pet->learnSpell(spellid);
     sLog.outDetail("PetTalentID: %u Rank: %u Spell: %u\n", talentId, talentRank, spellid);
-
-    // update free talent points
-    pet->SetFreeTalentPoints(CurTalentPoints - (talentRank - curtalent_maxrank + 1));
 }
 
 void Player::UpdateKnownCurrencies(uint32 itemId, bool apply)
