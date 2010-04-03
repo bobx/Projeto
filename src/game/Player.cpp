@@ -2132,7 +2132,7 @@ void Player::Regenerate(Powers power, uint32 diff)
                     AuraList const& ModPowerRegenPCTAuras = GetAurasByType(SPELL_AURA_MOD_POWER_REGEN_PERCENT);
                     for(AuraList::const_iterator i = ModPowerRegenPCTAuras.begin(); i != ModPowerRegenPCTAuras.end(); ++i)
                         if ((*i)->GetModifier()->m_miscvalue == power && (*i)->GetMiscBValue()==GetCurrentRune(rune))
-                            cd_diff = cd_diff * ((*i)->GetModifier()->m_amount + 100) / 100.0f;
+                            cd_diff = cd_diff * ((*i)->GetModifier()->m_amount + 100) / 100;
 
                     SetRuneCooldown(rune, (cd < cd_diff) ? 0 : cd - cd_diff);
                 }
@@ -3780,7 +3780,7 @@ bool Player::resetTalents(bool no_cost)
         TalentEntry const *talentInfo = (*iter).second.m_talentEntry;
         if (!talentInfo)
         {
-            iter = m_talents[m_activeSpec].erase(iter);
+            m_talents[m_activeSpec].erase(iter++);
             continue;
         }
 
@@ -3788,7 +3788,7 @@ bool Player::resetTalents(bool no_cost)
 
         if (!talentTabInfo)
         {
-            iter = m_talents[m_activeSpec].erase(iter);
+            m_talents[m_activeSpec].erase(iter++);
             continue;
         }
 
