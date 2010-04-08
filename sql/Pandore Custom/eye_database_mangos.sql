@@ -1,4 +1,5 @@
 UPDATE `creature_template` SET `modelid_A` = 16925, `modelid_H` = 16925, `scale` = 2, `unit_flags` = 33554432, `flags_extra` = 0 WHERE `entry` IN (28525,28542,28543,28544);
+
 UPDATE `creature_template` SET `ScriptName` = 'npc_eye_of_acherus' WHERE `entry` = 28511;
 
 UPDATE `gameobject_template` SET `ScriptName` = 'go_eye_of_acherus' WHERE `entry` = 191609;

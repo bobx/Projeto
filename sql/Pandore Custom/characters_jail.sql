@@ -24,11 +24,11 @@ CREATE TABLE `jail_conf` (
 -- ----------------------------
 -- Records 
 -- ----------------------------
-INSERT INTO `jail_conf` VALUES ('1', 'm_jailconf_max_jails', '3', null, 'Hier legst ihre fest nach wie fielen Jails der Char gelÃ¶scht werden \r\nStandart = 3\r\n ', '');
+INSERT INTO `jail_conf` VALUES ('1', 'm_jailconf_max_jails', '3', null, 'Hier legst ihre fest nach wie fielen Jails der Char gelöscht werden \r\nStandart = 3\r\n ', '');
 INSERT INTO `jail_conf` VALUES ('2', 'm_jailconf_max_duration', '672', null, 'Hier legst ihre fest wie hoch der maximale Jail Time in Stunden \r\nStandart = 672\r\n', '');
-INSERT INTO `jail_conf` VALUES ('3', 'm_jailconf_min_reason', '25', null, 'Hier legst ihre die minimalen Zeichen fest die als Grund angeben mÃ¼sst  \r\nStandart = 25\r\n\r\n', '');
-INSERT INTO `jail_conf` VALUES ('4', 'm_jailconf_warn_player', '1', null, 'Hier legst ihre fest wann der Char gewarnt wirt  bevor er gelÃ¶scht wird \r\nStandart = 1\r\n', '');
-INSERT INTO `jail_conf` VALUES ('5', 'm_jailconf_amnestie', '180', null, 'Hier legst ihre in Tagen fest wann der Jail Status  auf 0 zurÃ¼ckgesetzt wird   \r\nStandart = 180 Tage (das entspricht ca. Â½ Jahr)  \r\n                     0  Tage (Aus )\r\n', '');
+INSERT INTO `jail_conf` VALUES ('3', 'm_jailconf_min_reason', '25', null, 'Hier legst ihre die minimalen Zeichen fest die als Grund angeben müsst  \r\nStandart = 25\r\n\r\n', '');
+INSERT INTO `jail_conf` VALUES ('4', 'm_jailconf_warn_player', '1', null, 'Hier legst ihre fest wann der Char gewarnt wirt  bevor er gelöscht wird \r\nStandart = 1\r\n', '');
+INSERT INTO `jail_conf` VALUES ('5', 'm_jailconf_amnestie', '180', null, 'Hier legst ihre in Tagen fest wann der Jail Status  auf 0 zurückgesetzt wird   \r\nStandart = 180 Tage (das entspricht ca. ½ Jahr)  \r\n                     0  Tage (Aus )\r\n', '');
 INSERT INTO `jail_conf` VALUES ('6', 'm_jailconf_ally_x', null, '31.7282', 'Teleport Alliance  X Achse \r\nStandart = 31,7282\r\n', '');
 INSERT INTO `jail_conf` VALUES ('7', 'm_jailconf_ally_y', null, '135.794', 'Teleport Alliance  Y Achse \r\nStandart = 135,794\r\n', '');
 INSERT INTO `jail_conf` VALUES ('8', 'm_jailconf_ally_z', null, '-40.0508', 'Teleport Alliance  Z Achse \r\nStandart = -40,0508', '');

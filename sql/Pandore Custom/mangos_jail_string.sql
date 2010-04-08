@@ -1,4 +1,4 @@
-ï»¿DELETE FROM mangos_string WHERE `entry` IN (950, 951, 952, 953, 954, 955, 956, 957, 958, 959, 960, 961, 962, 963, 964, 965, 966, 967, 968, 969, 970, 971, 972, 973, 974, 975, 976, 977, 978, 979, 980, 981, 982, 983);
+?DELETE FROM mangos_string WHERE `entry` IN (950, 951, 952, 953, 954, 955, 956, 957, 958, 959, 960, 961, 962, 963, 964, 965, 966, 967, 968, 969, 970, 971, 972, 973, 974, 975, 976, 977, 978, 979, 980, 981, 982, 983);
 INSERT INTO mangos_string
    (`entry`, `content_default`, `content_loc1`, `content_loc2`, `content_loc3`, `content_loc4`, `content_loc5`, `content_loc6`, `content_loc7`, `content_loc8`)
 VALUES
@@ -92,7 +92,7 @@ VALUES
 INSERT INTO mangos_string
    (`entry`, `content_default`, `content_loc1`, `content_loc2`, `content_loc3`, `content_loc4`, `content_loc5`, `content_loc6`, `content_loc7`, `content_loc8`)
 VALUES
-   (968, '|cffff0000[!!! ATTENTION - IMPORTANT - WARNING !!!\r\n You were already %u times in prison beim %u mal your character will be deleted\r\n|cffff0000!!! ATTENTION - IMPORTANT - WARNING !!!]', NULL, '|cffff0000[!!!ATTENTION - ATTENTION - ATTENTION!!!\r\n Vous Ã©tiez dÃ©jÃ  %u fois en prison en %u fois, votre personnage supprimÃ©\r\n|cffff0000!!! ATTENTION - ATTENTION - ATTENTION !!!]', '|cffff0000[!!! ACHTUNG - WICHTIG - WARNUNG !!!\r\n Du warst schon %u mal in Knast beim %u mal wird dein Charakter gelÃ¶scht\r\n|cffff0000!!! ACHTUNG - WICHTIG - WARNUNG !!!]', NULL, NULL, NULL, NULL, NULL);
+   (968, '|cffff0000[!!! ATTENTION - IMPORTANT - WARNING !!!\r\n You were already %u times in prison beim %u mal your character will be deleted\r\n|cffff0000!!! ATTENTION - IMPORTANT - WARNING !!!]', NULL, '|cffff0000[!!!ATTENTION - ATTENTION - ATTENTION!!!\r\n Vous étiez déjà %u fois en prison en %u fois, votre personnage supprimé\r\n|cffff0000!!! ATTENTION - ATTENTION - ATTENTION !!!]', '|cffff0000[!!! ACHTUNG - WICHTIG - WARNUNG !!!\r\n Du warst schon %u mal in Knast beim %u mal wird dein Charakter gelöscht\r\n|cffff0000!!! ACHTUNG - WICHTIG - WARNUNG !!!]', NULL, NULL, NULL, NULL, NULL);
 
 INSERT INTO mangos_string
    (`entry`, `content_default`, `content_loc1`, `content_loc2`, `content_loc3`, `content_loc4`, `content_loc5`, `content_loc6`, `content_loc7`, `content_loc8`)
@@ -167,5 +167,5 @@ VALUES
 INSERT INTO mangos_string
    (`entry`, `content_default`, `content_loc1`, `content_loc2`, `content_loc3`, `content_loc4`, `content_loc5`, `content_loc6`, `content_loc7`, `content_loc8`)
 VALUES
-   (983, 'Your Jail status was reset to 0 gesatzt', NULL, 'Votre statut a Ã©tÃ© Jail Ã  0 gesatzt', 'Dein Jail status wurde auf 0 zurÃ¼ck gesatzt', NULL, NULL, NULL, NULL, NULL);
+   (983, 'Your Jail status was reset to 0 gesatzt', NULL, 'Votre statut a été Jail à 0 gesatzt', 'Dein Jail status wurde auf 0 zurück gesatzt', NULL, NULL, NULL, NULL, NULL);
 

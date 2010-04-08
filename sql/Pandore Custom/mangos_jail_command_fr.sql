@@ -1,4 +1,4 @@
-ï»¿/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+?/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
 /*!40101 SET NAMES utf8 */;
@@ -13,6 +13,6 @@ DELETE FROM `command` WHERE name IN ('jail','jailinfo','unjail','jailreload','pi
 INSERT INTO `command` (name, security, help) VALUES
 ('jail', 1, 'Syntaxe: .jail #personage #heures #raison\nEmprisonner un \'personnage\' pendant \'heures\' pour la \'raison\'.'),
 ('jailinfo', 0, 'Syntaxe: .jailinfo\nVoir le statut de vos emprisonnements.'),
-('unjail', 1, 'Syntaxe: .unjail #personnages\nLibÃ©rer le \'personnage\' de la prison.'),
+('unjail', 1, 'Syntaxe: .unjail #personnages\nLibérer le \'personnage\' de la prison.'),
 ('jailreload', 3, 'Syntaxe: .jailreload\nRecharger la configuration du Jail.'),
-('pinfo', 2, 'Syntaxe: .pinfo #joueur rep jail\nVoir les information du compte d\'un \'joueur\'.\nSi le paramÃ¨tre \'rep\' est mis, vous allez voir les infos sur la rÃ©putation du joueur.\nSi le paramÃ¨tre \'jail\' est mis, vous allez voir les infos sur les emprisonnements du joueurs.');
+('pinfo', 2, 'Syntaxe: .pinfo #joueur rep jail\nVoir les information du compte d\'un \'joueur\'.\nSi le paramètre \'rep\' est mis, vous allez voir les infos sur la réputation du joueur.\nSi le paramètre \'jail\' est mis, vous allez voir les infos sur les emprisonnements du joueurs.');
