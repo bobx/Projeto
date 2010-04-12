@@ -113,7 +113,8 @@ m_lootMoney(0), m_lootRecipient(0),
 m_deathTimer(0), m_respawnTime(0), m_respawnDelay(25), m_corpseDelay(60), m_respawnradius(5.0f),
 m_subtype(subtype), m_defaultMovementType(IDLE_MOTION_TYPE), m_DBTableGuid(0), m_equipmentId(0),
 m_AlreadyCallAssistance(false), m_AlreadySearchedAssistance(false),
-m_regenHealth(true), m_AI_locked(false), m_isDeadByDefault(false), m_meleeDamageSchoolMask(SPELL_SCHOOL_MASK_NORMAL),
+m_regenHealth(true), m_AI_locked(false), m_isDeadByDefault(false), m_needNotify(false),
+m_meleeDamageSchoolMask(SPELL_SCHOOL_MASK_NORMAL),
 m_creatureInfo(NULL), m_isActiveObject(false), m_splineFlags(SPLINEFLAG_WALKMODE)
 {
     m_regenTimer = 200;
@@ -335,6 +336,15 @@ void Creature::Update(uint32 diff)
         m_GlobalCooldown = 0;
     else
         m_GlobalCooldown -= diff;
+
+    if (m_needNotify)
+    {
+        m_needNotify = false;
+        RelocationNotify();
+
+        if (!IsInWorld())
+            return;
+    }
 
     switch( m_deathState )
     {
@@ -559,16 +569,9 @@ void Creature::DoFleeToGetAssistance()
     {
         Creature* pCreature = NULL;
 
-        CellPair p(MaNGOS::ComputeCellPair(GetPositionX(), GetPositionY()));
-        Cell cell(p);
-        cell.data.Part.reserved = ALL_DISTRICT;
-        cell.SetNoCreate();
         MaNGOS::NearestAssistCreatureInCreatureRangeCheck u_check(this, getVictim(), radius);
         MaNGOS::CreatureLastSearcher<MaNGOS::NearestAssistCreatureInCreatureRangeCheck> searcher(this, pCreature, u_check);
-
-        TypeContainerVisitor<MaNGOS::CreatureLastSearcher<MaNGOS::NearestAssistCreatureInCreatureRangeCheck>, GridTypeMapContainer > grid_creature_searcher(searcher);
-
-        cell.Visit(p, grid_creature_searcher, *GetMap(), *this, radius);
+        Cell::VisitGridObjects(this, searcher, radius);
 
         SetNoSearchAssistance(true);
         UpdateSpeed(MOVE_RUN, false);
@@ -1536,17 +1539,9 @@ void Creature::CallAssistance()
             std::list<Creature*> assistList;
 
             {
-                CellPair p(MaNGOS::ComputeCellPair(GetPositionX(), GetPositionY()));
-                Cell cell(p);
-                cell.data.Part.reserved = ALL_DISTRICT;
-                cell.SetNoCreate();
-
                 MaNGOS::AnyAssistCreatureInRangeCheck u_check(this, getVictim(), radius);
                 MaNGOS::CreatureListSearcher<MaNGOS::AnyAssistCreatureInRangeCheck> searcher(this, assistList, u_check);
-
-                TypeContainerVisitor<MaNGOS::CreatureListSearcher<MaNGOS::AnyAssistCreatureInRangeCheck>, GridTypeMapContainer >  grid_creature_searcher(searcher);
-
-                cell.Visit(p, grid_creature_searcher, *GetMap(), *this, radius);
+                Cell::VisitGridObjects(this,searcher, radius);
             }
 
             if (!assistList.empty())
@@ -1569,17 +1564,9 @@ void Creature::CallForHelp(float fRadius)
     if (fRadius <= 0.0f || !getVictim() || isPet() || isCharmed())
         return;
 
-    CellPair p(MaNGOS::ComputeCellPair(GetPositionX(), GetPositionY()));
-    Cell cell(p);
-    cell.data.Part.reserved = ALL_DISTRICT;
-    cell.SetNoCreate();
-
     MaNGOS::CallOfHelpCreatureInRangeDo u_do(this, getVictim(), fRadius);
     MaNGOS::CreatureWorker<MaNGOS::CallOfHelpCreatureInRangeDo> worker(this, u_do);
-
-    TypeContainerVisitor<MaNGOS::CreatureWorker<MaNGOS::CallOfHelpCreatureInRangeDo>, GridTypeMapContainer >  grid_creature_searcher(worker);
-
-    cell.Visit(p, grid_creature_searcher, *GetMap(), *this, fRadius);
+    Cell::VisitGridObjects(this,worker, fRadius);
 }
 
 bool Creature::CanAssistTo(const Unit* u, const Unit* enemy, bool checkfaction /*= true*/) const
@@ -2085,4 +2072,11 @@ void Creature::SendAreaSpiritHealerQueryOpcode(Player *pl)
     WorldPacket data(SMSG_AREA_SPIRIT_HEALER_TIME, 8 + 4);
     data << GetGUID() << next_resurrect;
     pl->SendDirectMessage(&data);
+}
+
+void Creature::RelocationNotify()
+{
+    MaNGOS::CreatureRelocationNotifier relocationNotifier(*this);
+    float radius = MAX_CREATURE_ATTACK_RADIUS * sWorld.getConfig(CONFIG_FLOAT_RATE_CREATURE_AGGRO);
+    Cell::VisitAllObjects(this, relocationNotifier, radius);
 }
