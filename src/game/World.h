@@ -77,7 +77,8 @@ enum WorldTimers
     WUPDATE_UPTIME      = 4,
     WUPDATE_CORPSES     = 5,
     WUPDATE_EVENTS      = 6,
-    WUPDATE_COUNT       = 7
+    WUPDATE_EXT_MAIL    = 7,
+    WUPDATE_COUNT       = 8
 };
 
 /// Configuration elements
@@ -177,6 +178,10 @@ enum eConfigUInt32Values
     CONFIG_UINT32_TIMERBAR_FIRE_GMLEVEL,
     CONFIG_UINT32_TIMERBAR_FIRE_MAX,
     CONFIG_UINT32_MIN_LEVEL_STAT_SAVE,
+    // External Mail
+    CONFIG_UINT32_EXTERNAL_MAIL,
+    CONFIG_UINT32_EXTERNAL_MAIL_INTERVAL,
+
     CONFIG_UINT32_VALUE_COUNT
 };
 

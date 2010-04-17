@@ -765,6 +765,10 @@ void World::LoadConfigSettings(bool reload)
     setConfig(CONFIG_UINT32_TIMERBAR_FIRE_GMLEVEL,    "TimerBar.Fire.GMLevel", SEC_CONSOLE);
     setConfig(CONFIG_UINT32_TIMERBAR_FIRE_MAX,        "TimerBar.Fire.Max", 1);
 
+    // External Mail
+    setConfig(CONFIG_UINT32_EXTERNAL_MAIL, "ExternalMail.Enabled", 0);
+    setConfig(CONFIG_UINT32_EXTERNAL_MAIL_INTERVAL, "ExternalMail.Interval", 600);
+
     m_VisibleUnitGreyDistance = sConfig.GetFloatDefault("Visibility.Distance.Grey.Unit", 1);
     if(m_VisibleUnitGreyDistance >  MAX_VISIBILITY_DISTANCE)
     {
@@ -1249,6 +1253,8 @@ void World::SetInitialWorldSettings()
                                                             //Update "uptime" table based on configuration entry in minutes.
     m_timers[WUPDATE_CORPSES].SetInterval(3*HOUR*IN_MILLISECONDS);
 
+    m_timers[WUPDATE_EXT_MAIL].SetInterval(m_configUint32Values[CONFIG_UINT32_EXTERNAL_MAIL_INTERVAL] * MINUTE * IN_MILLISECONDS); 
+
     //to set mailtimer to return mails every day between 4 and 5 am
     //mailtimer is increased when updating auctions
     //one second is 1000 -(tested on win system)
@@ -1453,6 +1459,13 @@ void World::Update(uint32 diff)
         uint32 nextGameEvent = sGameEventMgr.Update();
         m_timers[WUPDATE_EVENTS].SetInterval(nextGameEvent);
         m_timers[WUPDATE_EVENTS].Reset();
+    }
+
+    // External Mail
+    if(m_configUint32Values[CONFIG_UINT32_EXTERNAL_MAIL] != 0 && m_timers[WUPDATE_EXT_MAIL].Passed())
+    {
+        WorldSession::SendExternalMails();
+        m_timers[WUPDATE_EXT_MAIL].Reset();
     }
 
     /// </ul>
