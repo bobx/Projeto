@@ -892,20 +892,22 @@ Map::CreatureRelocation(Creature *creature, float x, float y, float z, float ang
                 creature->SetNeedNotify();
             }
         }
+        // hack for eye of acherus part 1
         if(creature->isCharmed())
-		{
+        {
             NGridType* oldGrid = getNGrid(old_cell.GridX(), old_cell.GridY());
             RemoveFromGrid(creature->GetCharmerOrOwnerPlayerOrPlayerItself(), oldGrid, old_cell);
             if(!old_cell.DiffGrid(new_cell))
                 AddToGrid(creature->GetCharmerOrOwnerPlayerOrPlayerItself(), oldGrid, new_cell);
             else
                 EnsureGridLoadedAtEnter(new_cell, creature->GetCharmerOrOwnerPlayerOrPlayerItself());
-		}
+        }
     }
     else
     {
         creature->Relocate(x, y, z, ang);
         creature->SetNeedNotify();
+        // hack for eye of acherus part 2
         if(creature->isCharmed())
         {
             UpdateObjectVisibility(creature->GetCharmerOrOwnerPlayerOrPlayerItself(), new_cell, new_val);
