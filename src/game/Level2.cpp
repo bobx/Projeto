@@ -742,7 +742,7 @@ bool ChatHandler::HandleGameObjectAddCommand(const char* args)
     {
         uint32 value = atoi((char*)spawntimeSecs);
         pGameObj->SetRespawnTime(value);
-        //sLog.outDebug("*** spawntimeSecs: %d", value);
+        //DEBUG_LOG("*** spawntimeSecs: %d", value);
     }
 
     // fill the gameobject data and save to the db
@@ -755,7 +755,7 @@ bool ChatHandler::HandleGameObjectAddCommand(const char* args)
         return false;
     }
 
-    sLog.outDebug(GetMangosString(LANG_GAMEOBJECT_CURRENT), gInfo->name, db_lowGUID, x, y, z, o);
+    DEBUG_LOG(GetMangosString(LANG_GAMEOBJECT_CURRENT), gInfo->name, db_lowGUID, x, y, z, o);
 
     map->Add(pGameObj);
 
@@ -2482,7 +2482,7 @@ bool ChatHandler::HandleDelTicketCommand(const char *args)
  */
 bool ChatHandler::HandleWpAddCommand(const char* args)
 {
-    sLog.outDebug("DEBUG: HandleWpAddCommand");
+    DEBUG_LOG("DEBUG: HandleWpAddCommand");
 
     // optional
     char* guid_str = NULL;
@@ -2498,7 +2498,7 @@ bool ChatHandler::HandleWpAddCommand(const char* args)
     // Did player provide a GUID?
     if (!guid_str)
     {
-        sLog.outDebug("DEBUG: HandleWpAddCommand - No GUID provided");
+        DEBUG_LOG("DEBUG: HandleWpAddCommand - No GUID provided");
 
         // No GUID provided
         // -> Player must have selected a creature
@@ -2511,7 +2511,7 @@ bool ChatHandler::HandleWpAddCommand(const char* args)
         }
         if (target->GetEntry() == VISUAL_WAYPOINT )
         {
-            sLog.outDebug("DEBUG: HandleWpAddCommand - target->GetEntry() == VISUAL_WAYPOINT (1) ");
+            DEBUG_LOG("DEBUG: HandleWpAddCommand - target->GetEntry() == VISUAL_WAYPOINT (1) ");
 
             QueryResult *result =
                 WorldDatabase.PQuery( "SELECT id, point FROM creature_movement WHERE wpguid = %u",
@@ -2567,7 +2567,7 @@ bool ChatHandler::HandleWpAddCommand(const char* args)
     }
     else
     {
-        sLog.outDebug("DEBUG: HandleWpAddCommand - GUID provided");
+        DEBUG_LOG("DEBUG: HandleWpAddCommand - GUID provided");
 
         // GUID provided
         // Warn if player also selected a creature
@@ -2596,9 +2596,9 @@ bool ChatHandler::HandleWpAddCommand(const char* args)
     }
     // lowguid -> GUID of the NPC
     // point   -> number of the waypoint (if not 0)
-    sLog.outDebug("DEBUG: HandleWpAddCommand - danach");
+    DEBUG_LOG("DEBUG: HandleWpAddCommand - danach");
 
-    sLog.outDebug("DEBUG: HandleWpAddCommand - point == 0");
+    DEBUG_LOG("DEBUG: HandleWpAddCommand - point == 0");
 
     Player* player = m_session->GetPlayer();
     sWaypointMgr.AddLastNode(lowguid, player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetOrientation(), 0, 0);
@@ -2645,7 +2645,7 @@ bool ChatHandler::HandleWpAddCommand(const char* args)
  */
 bool ChatHandler::HandleWpModifyCommand(const char* args)
 {
-    sLog.outDebug("DEBUG: HandleWpModifyCommand");
+    DEBUG_LOG("DEBUG: HandleWpModifyCommand");
 
     if(!*args)
         return false;
@@ -2680,7 +2680,7 @@ bool ChatHandler::HandleWpModifyCommand(const char* args)
 
     if(target)
     {
-        sLog.outDebug("DEBUG: HandleWpModifyCommand - User did select an NPC");
+        DEBUG_LOG("DEBUG: HandleWpModifyCommand - User did select an NPC");
 
         // Did the user select a visual spawnpoint?
         if (target->GetEntry() != VISUAL_WAYPOINT )
@@ -2702,14 +2702,14 @@ bool ChatHandler::HandleWpModifyCommand(const char* args)
             SetSentErrorMessage(true);
             return false;
         }
-        sLog.outDebug("DEBUG: HandleWpModifyCommand - After getting wpGuid");
+        DEBUG_LOG("DEBUG: HandleWpModifyCommand - After getting wpGuid");
 
         Field *fields = result->Fetch();
         lowguid = fields[0].GetUInt32();
         point   = fields[1].GetUInt32();
 
         // Cleanup memory
-        sLog.outDebug("DEBUG: HandleWpModifyCommand - Cleanup memory");
+        DEBUG_LOG("DEBUG: HandleWpModifyCommand - Cleanup memory");
         delete result;
     }
     else
@@ -2779,7 +2779,7 @@ bool ChatHandler::HandleWpModifyCommand(const char* args)
         }
     }
 
-    sLog.outDebug("DEBUG: HandleWpModifyCommand - Parameters parsed - now execute the command");
+    DEBUG_LOG("DEBUG: HandleWpModifyCommand - Parameters parsed - now execute the command");
 
     // wpGuid  -> GUID of the waypoint creature
     // lowguid -> GUID of the NPC
@@ -2810,13 +2810,13 @@ bool ChatHandler::HandleWpModifyCommand(const char* args)
             return false;
         }
 
-        sLog.outDebug("DEBUG: HandleWpModifyCommand - add -- npcCreature");
+        DEBUG_LOG("DEBUG: HandleWpModifyCommand - add -- npcCreature");
 
         // What to do:
         // Add the visual spawnpoint (DB only)
         // Adjust the waypoints
         // Respawn the owner of the waypoints
-        sLog.outDebug("DEBUG: HandleWpModifyCommand - add");
+        DEBUG_LOG("DEBUG: HandleWpModifyCommand - add");
 
         Player* chr = m_session->GetPlayer();
         Map *map = chr->GetMap();
@@ -3054,7 +3054,7 @@ bool ChatHandler::HandleWpModifyCommand(const char* args)
  */
 bool ChatHandler::HandleWpShowCommand(const char* args)
 {
-    sLog.outDebug("DEBUG: HandleWpShowCommand");
+    DEBUG_LOG("DEBUG: HandleWpShowCommand");
 
     if(!*args)
         return false;
@@ -3067,7 +3067,7 @@ bool ChatHandler::HandleWpShowCommand(const char* args)
     }
     // second arg: GUID (optional, if a creature is selected)
     char* guid_str = strtok((char*)NULL, " ");
-    sLog.outDebug("DEBUG: HandleWpShowCommand: show_str: %s guid_str: %s", show_str, guid_str);
+    DEBUG_LOG("DEBUG: HandleWpShowCommand: show_str: %s guid_str: %s", show_str, guid_str);
     //if (!guid_str) {
     //    return false;
     //}
@@ -3079,7 +3079,7 @@ bool ChatHandler::HandleWpShowCommand(const char* args)
     // Did player provide a GUID?
     if (!guid_str)
     {
-        sLog.outDebug("DEBUG: HandleWpShowCommand: !guid_str");
+        DEBUG_LOG("DEBUG: HandleWpShowCommand: !guid_str");
         // No GUID provided
         // -> Player must have selected a creature
 
@@ -3092,7 +3092,7 @@ bool ChatHandler::HandleWpShowCommand(const char* args)
     }
     else
     {
-        sLog.outDebug("DEBUG: HandleWpShowCommand: GUID provided");
+        DEBUG_LOG("DEBUG: HandleWpShowCommand: GUID provided");
         // GUID provided
         // Warn if player also selected a creature
         // -> Creature selection is ignored <-
@@ -3126,7 +3126,7 @@ bool ChatHandler::HandleWpShowCommand(const char* args)
     std::string show = show_str;
     uint32 Maxpoint;
 
-    sLog.outDebug("DEBUG: HandleWpShowCommand: lowguid: %u show: %s", lowguid, show_str);
+    DEBUG_LOG("DEBUG: HandleWpShowCommand: lowguid: %u show: %s", lowguid, show_str);
 
     // Show info for the selected waypoint
     if(show == "info")
@@ -3277,7 +3277,7 @@ bool ChatHandler::HandleWpShowCommand(const char* args)
             }
 
             wpCreature->SetVisibility(VISIBILITY_OFF);
-            sLog.outDebug("DEBUG: UPDATE creature_movement SET wpguid = '%u", wpCreature->GetGUIDLow());
+            DEBUG_LOG("DEBUG: UPDATE creature_movement SET wpguid = '%u", wpCreature->GetGUIDLow());
             // set "wpguid" column to the visual waypoint
             WorldDatabase.PExecuteLog("UPDATE creature_movement SET wpguid = '%u' WHERE id = '%u' and point = '%u'", wpCreature->GetGUIDLow(), lowguid, point);
 
