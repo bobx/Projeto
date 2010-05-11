@@ -153,7 +153,7 @@ pEffect SpellEffects[TOTAL_SPELL_EFFECTS]=
     &Spell::EffectKillCreditPersonal,                       // 90 SPELL_EFFECT_KILL_CREDIT              Kill credit but only for single person
     &Spell::EffectUnused,                                   // 91 SPELL_EFFECT_THREAT_ALL               one spell: zzOLDBrainwash
     &Spell::EffectEnchantHeldItem,                          // 92 SPELL_EFFECT_ENCHANT_HELD_ITEM
-    &Spell::EffectUnused,                                   // 93 SPELL_EFFECT_93 (old SPELL_EFFECT_SUMMON_PHANTASM)
+    &Spell::EffectBreakPlayerTargeting,                     // 93 SPELL_EFFECT_BREAK_PLAYER_TARGETING
     &Spell::EffectSelfResurrect,                            // 94 SPELL_EFFECT_SELF_RESURRECT
     &Spell::EffectSkinning,                                 // 95 SPELL_EFFECT_SKINNING
     &Spell::EffectCharge,                                   // 96 SPELL_EFFECT_CHARGE
@@ -5055,6 +5055,23 @@ void Spell::EffectWeaponDmg(SpellEffectIndex eff_idx)
     int32 spell_bonus = 0;                                  // bonus specific for spell
     switch(m_spellInfo->SpellFamilyName)
     {
+        case SPELLFAMILY_GENERIC:
+        {
+            switch(m_spellInfo->Id)                         // for spells with divided damage to targets
+            {
+                case 66765: case 67333:                     // Meteor Fists
+                {
+                    uint32 count = 0;
+                    for(std::list<TargetInfo>::iterator ihit = m_UniqueTargetInfo.begin(); ihit != m_UniqueTargetInfo.end(); ++ihit) 
+                        if(ihit->effectMask & (1<<eff_idx))
+                            ++count;
+
+                    totalDamagePercentMod /= float(count);  // divide to all targets
+                    break;
+                }
+            }
+            break;
+        }
         case SPELLFAMILY_WARRIOR:
         {
             // Devastate bonus and sunder armor refresh
@@ -7300,6 +7317,16 @@ void Spell::EffectDestroyAllTotems(SpellEffectIndex /*eff_idx*/)
 
     if (mana)
         m_caster->CastCustomSpell(m_caster, 39104, &mana, NULL, NULL, true);
+}
+
+void Spell::EffectBreakPlayerTargeting (SpellEffectIndex /* eff_idx */)
+{
+    if (!unitTarget)
+        return;
+
+    WorldPacket data(SMSG_CLEAR_TARGET, 8);
+    data << unitTarget->GetObjectGuid();
+    unitTarget->SendMessageToSet(&data, false);
 }
 
 void Spell::EffectDurabilityDamage(SpellEffectIndex eff_idx)
