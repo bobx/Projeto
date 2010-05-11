@@ -928,8 +928,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
     unitTarget = unit;
 
     // Reset damage/healing counter
-    m_damage = 0;
-    m_healing = 0;
+    ResetEffectDamageAndHeal();
 
     // Fill base trigger info
     uint32 procAttacker = m_procAttacker;
@@ -1084,6 +1083,8 @@ void Spell::DoSpellHitOnUnit(Unit *unit, const uint32 effectMask)
     {
         if (realCaster)
             realCaster->SendSpellMiss(unit, m_spellInfo->Id, SPELL_MISS_IMMUNE);
+
+        ResetEffectDamageAndHeal();
         return;
     }
 
@@ -1104,6 +1105,7 @@ void Spell::DoSpellHitOnUnit(Unit *unit, const uint32 effectMask)
             unit->GetCharmerOrOwnerGUID() != m_caster->GetGUID())
         {
             realCaster->SendSpellMiss(unit, m_spellInfo->Id, SPELL_MISS_EVADE);
+            ResetEffectDamageAndHeal();
             return;
         }
 
@@ -1114,6 +1116,7 @@ void Spell::DoSpellHitOnUnit(Unit *unit, const uint32 effectMask)
                 !unit->isVisibleForOrDetect(m_caster, m_caster, false))
             {
                 realCaster->SendSpellMiss(unit, m_spellInfo->Id, SPELL_MISS_EVADE);
+                ResetEffectDamageAndHeal();
                 return;
             }
 
@@ -1152,6 +1155,7 @@ void Spell::DoSpellHitOnUnit(Unit *unit, const uint32 effectMask)
             if (m_spellInfo->speed > 0.0f && !IsPositiveSpell(m_spellInfo->Id))
             {
                 realCaster->SendSpellMiss(unit, m_spellInfo->Id, SPELL_MISS_EVADE);
+                ResetEffectDamageAndHeal();
                 return;
             }
 
@@ -6506,4 +6510,10 @@ WorldObject* Spell::GetCastingObject() const
         return m_caster->IsInWorld() ? m_caster->GetMap()->GetGameObject(m_originalCasterGUID) : NULL;
     else
         return m_caster;
+}
+
+void Spell::ResetEffectDamageAndHeal()
+{
+    m_damage = 0;
+    m_healing = 0;
 }
