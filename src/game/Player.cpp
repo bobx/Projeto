@@ -4367,7 +4367,7 @@ void Player::DeleteOldCharacters(uint32 keepDays)
     QueryResult *resultChars = CharacterDatabase.PQuery("SELECT guid, deleteInfos_Account FROM characters WHERE deleteDate IS NOT NULL AND deleteDate < '" UI64FMTD "'", uint64(time(NULL) - time_t(keepDays * DAY)));
     if (resultChars)
     {
-        sLog.outString("Player::DeleteOldChars: Found %u character(s) to delete",resultChars->GetRowCount());
+        sLog.outString("Player::DeleteOldChars: Found %u character(s) to delete",uint32(resultChars->GetRowCount()));
         do
         {
             Field *charFields = resultChars->Fetch();
@@ -19496,7 +19496,7 @@ void Player::SendInitialPacketsBeforeAddToMap()
     SendTalentsInfoData(false);
 
     data.Initialize(SMSG_INSTANCE_DIFFICULTY, 4+4);
-    data << uint32(0);
+    data << uint32(GetMap()->GetDifficulty());
     data << uint32(0);
     GetSession()->SendPacket(&data);
 
