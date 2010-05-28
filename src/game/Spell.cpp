@@ -6618,8 +6618,10 @@ void Spell::SelectMountByAreaAndSkill(Unit* target, uint32 spellId75, uint32 spe
 
                             // speed higher than 280 replace it
                             if (mountSpeed > 280)
+                            {
                                 target->CastSpell(target, spellIdSpecial, true);
-                            return;
+                                return;
+                            }
                         }
                     }
                 }
