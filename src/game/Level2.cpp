@@ -43,7 +43,7 @@
 #include <iostream>
 #include <fstream>
 #include <map>
-#include "Config/ConfigEnv.h"
+#include "Config/Config.h"
 
 #include "TargetedMovementGenerator.h"                      // for HandleNpcUnFollowCommand
 

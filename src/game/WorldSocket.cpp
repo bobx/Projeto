@@ -42,7 +42,7 @@
 #include "WorldSocketMgr.h"
 #include "Log.h"
 #include "DBCStores.h"
-#include "Config/ConfigEnv.h"
+#include "Config/Config.h"
 
 #if defined( __GNUC__ )
 #pragma pack(1)
