@@ -38,7 +38,7 @@
 #include "Util.h"
 #include "ArenaTeam.h"
 #include "Language.h"
-#include "Config/ConfigEnv.h"
+#include "Config/Config.h"
 
 // config option SkipCinematics supported values
 enum CinematicsSkipMode
