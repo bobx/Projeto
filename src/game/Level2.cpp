@@ -88,7 +88,7 @@ bool ChatHandler::HandleMuteCommand(const char* args)
     if (target)
         target->GetSession()->m_muteTime = mutetime;
 
-    loginDatabase.PExecute("UPDATE account SET mutetime = " UI64FMTD " WHERE id = '%u'",uint64(mutetime), account_id );
+    LoginDatabase.PExecute("UPDATE account SET mutetime = " UI64FMTD " WHERE id = '%u'",uint64(mutetime), account_id );
 
     if(target)
         ChatHandler(target).PSendSysMessage(LANG_YOUR_CHAT_DISABLED, notspeaktime);
@@ -133,7 +133,7 @@ bool ChatHandler::HandleUnmuteCommand(const char* args)
         target->GetSession()->m_muteTime = 0;
     }
 
-    loginDatabase.PExecute("UPDATE account SET mutetime = '0' WHERE id = '%u'", account_id );
+    LoginDatabase.PExecute("UPDATE account SET mutetime = '0' WHERE id = '%u'", account_id );
 
     if(target)
         ChatHandler(target).PSendSysMessage(LANG_YOUR_CHAT_ENABLED);
@@ -2115,7 +2115,7 @@ bool ChatHandler::HandleModifyPhaseCommand(const char* args)
 bool ChatHandler::HandlePInfoCommand(const char* args)
 {
     Player* target;
-	 char* py = NULL;
+	char* py = NULL;
     uint64 target_guid;
     std::string target_name;
     if(!extractPlayerTarget((char*)args,&target,&target_guid,&target_name))
@@ -2126,7 +2126,7 @@ bool ChatHandler::HandlePInfoCommand(const char* args)
     uint32 total_player_time = 0;
     uint32 level = 0;
     uint32 latency = 0;
-	 uint32 realmID = sConfig.GetIntDefault("RealmId", 0);
+    uint32 realmID = sConfig.GetIntDefault("RealmId", 0);
 
     // get additional information from Player object
     if(target)
@@ -2166,7 +2166,7 @@ bool ChatHandler::HandlePInfoCommand(const char* args)
     AccountTypes security = SEC_PLAYER;
     std::string last_login = GetMangosString(LANG_ERROR);
 		//                                             	0			1			2			3			4					5			6
-    QueryResult* result = loginDatabase.PQuery("SELECT a.username, a.gmlevel, a.last_ip, a.last_login, a_fp.accountid, a_fp.security, a_fp.realmid FROM account AS a LEFT JOIN account_forcepermission AS a_fp on a.id = a_fp.accountid WHERE a.id = '%u'", accId);
+    QueryResult* result = LoginDatabase.PQuery("SELECT a.username, a.gmlevel, a.last_ip, a.last_login, a_fp.accountid, a_fp.security, a_fp.realmid FROM account AS a LEFT JOIN account_forcepermission AS a_fp on a.id = a_fp.accountid WHERE a.id = '%u'", accId);
      if(result)
     {
         Field* fields = result->Fetch();
@@ -4149,9 +4149,9 @@ bool ChatHandler::HandleLookupAccountEmailCommand(const char* args)
     char* limit_str = strtok (NULL, " ");
     uint32 limit = limit_str ? atoi (limit_str) : 100;
 
-    loginDatabase.escape_string (email);
+    LoginDatabase.escape_string (email);
     //                                                 0   1         2        3        4
-    QueryResult *result = loginDatabase.PQuery("SELECT id, username, last_ip, gmlevel, expansion FROM account WHERE email "_LIKE_" "_CONCAT3_("'%%'","'%s'","'%%'"), email.c_str ());
+    QueryResult *result = LoginDatabase.PQuery("SELECT id, username, last_ip, gmlevel, expansion FROM account WHERE email "_LIKE_" "_CONCAT3_("'%%'","'%s'","'%%'"), email.c_str ());
 
     return ShowAccountListHelper(result,&limit);
 }
@@ -4166,10 +4166,10 @@ bool ChatHandler::HandleLookupAccountIpCommand(const char* args)
     char* limit_str = strtok (NULL, " ");
     uint32 limit = limit_str ? atoi (limit_str) : 100;
 
-    loginDatabase.escape_string (ip);
+    LoginDatabase.escape_string (ip);
 
     //                                                 0   1         2        3        4
-    QueryResult *result = loginDatabase.PQuery("SELECT id, username, last_ip, gmlevel, expansion FROM account WHERE last_ip "_LIKE_" "_CONCAT3_("'%%'","'%s'","'%%'"), ip.c_str ());
+    QueryResult *result = LoginDatabase.PQuery("SELECT id, username, last_ip, gmlevel, expansion FROM account WHERE last_ip "_LIKE_" "_CONCAT3_("'%%'","'%s'","'%%'"), ip.c_str ());
 
     return ShowAccountListHelper(result,&limit);
 }
@@ -4186,9 +4186,9 @@ bool ChatHandler::HandleLookupAccountNameCommand(const char* args)
     if (!AccountMgr::normalizeString (account))
         return false;
 
-    loginDatabase.escape_string (account);
+    LoginDatabase.escape_string (account);
     //                                                 0   1         2        3        4
-    QueryResult *result = loginDatabase.PQuery("SELECT id, username, last_ip, gmlevel, expansion FROM account WHERE username "_LIKE_" "_CONCAT3_("'%%'","'%s'","'%%'"), account.c_str ());
+    QueryResult *result = LoginDatabase.PQuery("SELECT id, username, last_ip, gmlevel, expansion FROM account WHERE username "_LIKE_" "_CONCAT3_("'%%'","'%s'","'%%'"), account.c_str ());
 
     return ShowAccountListHelper(result,&limit);
 }
@@ -4255,9 +4255,9 @@ bool ChatHandler::HandleLookupPlayerIpCommand(const char* args)
     char* limit_str = strtok (NULL, " ");
     uint32 limit = limit_str ? atoi (limit_str) : 100;
 
-    loginDatabase.escape_string (ip);
+    LoginDatabase.escape_string (ip);
 
-    QueryResult* result = loginDatabase.PQuery ("SELECT id,username FROM account WHERE last_ip "_LIKE_" "_CONCAT3_("'%%'","'%s'","'%%'"), ip.c_str ());
+    QueryResult* result = LoginDatabase.PQuery ("SELECT id,username FROM account WHERE last_ip "_LIKE_" "_CONCAT3_("'%%'","'%s'","'%%'"), ip.c_str ());
 
     return LookupPlayerSearchCommand (result,&limit);
 }
@@ -4274,9 +4274,9 @@ bool ChatHandler::HandleLookupPlayerAccountCommand(const char* args)
     if (!AccountMgr::normalizeString (account))
         return false;
 
-    loginDatabase.escape_string (account);
+    LoginDatabase.escape_string (account);
 
-    QueryResult* result = loginDatabase.PQuery ("SELECT id,username FROM account WHERE username "_LIKE_" "_CONCAT3_("'%%'","'%s'","'%%'"), account.c_str ());
+    QueryResult* result = LoginDatabase.PQuery ("SELECT id,username FROM account WHERE username "_LIKE_" "_CONCAT3_("'%%'","'%s'","'%%'"), account.c_str ());
 
     return LookupPlayerSearchCommand (result,&limit);
 }
@@ -4291,9 +4291,9 @@ bool ChatHandler::HandleLookupPlayerEmailCommand(const char* args)
     char* limit_str = strtok (NULL, " ");
     uint32 limit = limit_str ? atoi (limit_str) : 100;
 
-    loginDatabase.escape_string (email);
+    LoginDatabase.escape_string (email);
 
-    QueryResult* result = loginDatabase.PQuery ("SELECT id,username FROM account WHERE email "_LIKE_" "_CONCAT3_("'%%'","'%s'","'%%'"), email.c_str ());
+    QueryResult* result = LoginDatabase.PQuery ("SELECT id,username FROM account WHERE email "_LIKE_" "_CONCAT3_("'%%'","'%s'","'%%'"), email.c_str ());
 
     return LookupPlayerSearchCommand (result,&limit);
 }
