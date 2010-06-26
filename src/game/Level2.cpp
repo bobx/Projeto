@@ -529,7 +529,7 @@ bool ChatHandler::HandleGameObjectTargetCommand(const char* args)
 
     PSendSysMessage(LANG_GAMEOBJECT_DETAIL, lowguid, goI->name, lowguid, id, x, y, z, mapid, o);
 
-    if(target)
+    if (target)
     {
         time_t curRespawnDelay = target->GetRespawnTimeEx()-time(NULL);
         if(curRespawnDelay < 0)
@@ -539,6 +539,8 @@ bool ChatHandler::HandleGameObjectTargetCommand(const char* args)
         std::string defRespawnDelayStr = secsToTimeString(target->GetRespawnDelay(),true);
 
         PSendSysMessage(LANG_COMMAND_RAWPAWNTIMES, defRespawnDelayStr.c_str(),curRespawnDelayStr.c_str());
+
+        ShowNpcOrGoSpawnInformation<GameObject>(target->GetDBTableGUIDLow());
     }
     return true;
 }
@@ -861,7 +863,7 @@ bool ChatHandler::HandleGameObjectNearCommand(const char* args)
 
             GameObjectInfo const * gInfo = ObjectMgr::GetGameObjectInfo(entry);
 
-            if(!gInfo)
+            if (!gInfo)
                 continue;
 
             PSendSysMessage(LANG_GO_MIXED_LIST_CHAT, guid, entry, guid, gInfo->name, x, y, z, mapid);

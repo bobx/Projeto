@@ -3817,6 +3817,7 @@ bool ChatHandler::HandleNpcInfoCommand(const char* /*args*/)
         SendSysMessage(LANG_NPCINFO_TRAINER);
     }
 
+    ShowNpcOrGoSpawnInformation<Creature>(target->GetDBTableGUIDLow());
     return true;
 }
 
