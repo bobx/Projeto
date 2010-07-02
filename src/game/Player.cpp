@@ -13329,22 +13329,9 @@ bool Player::CanAddQuest( Quest const *pQuest, bool msg ) const
     if (!SatisfyQuestLog( msg ))
         return false;
 
-    uint32 srcitem = pQuest->GetSrcItemId();
-    if (srcitem > 0)
-    {
-        uint32 count = pQuest->GetSrcItemCount();
-        ItemPosCountVec dest;
-        uint8 msg2 = CanStoreNewItem( NULL_BAG, NULL_SLOT, dest, srcitem, count );
+    if (!CanGiveQuestSourceItem(pQuest))
+        return false;
 
-        // player already have max number (in most case 1) source item, no additional item needed and quest can be added.
-        if (msg2 == EQUIP_ERR_CANT_CARRY_MORE_OF_THIS)
-            return true;
-        else if (msg2 != EQUIP_ERR_OK)
-        {
-            SendEquipError(msg2, NULL, NULL, srcitem);
-            return false;
-        }
-    }
     return true;
 }
 
@@ -13544,7 +13531,8 @@ void Player::AddQuest( Quest const *pQuest, Object *questGiver )
             questStatusData.m_creatureOrGOcount[i] = 0;
     }
 
-    GiveQuestSourceItem( pQuest );
+    GiveQuestSourceItem(pQuest);
+
     AdjustQuestReqItemCount( pQuest, questStatusData );
 
     if( pQuest->GetRepObjectiveFaction() )
@@ -14156,7 +14144,7 @@ bool Player::SatisfyQuestWeek( Quest const* qInfo, bool msg ) const
     return m_weeklyquests.find(qInfo->GetQuestId()) == m_weeklyquests.end();
 }
 
-bool Player::GiveQuestSourceItem( Quest const *pQuest )
+bool Player::CanGiveQuestSourceItem( Quest const *pQuest, ItemPosCountVec* dest ) const
 {
     uint32 srcitem = pQuest->GetSrcItemId();
     if (srcitem > 0)
@@ -14165,14 +14153,17 @@ bool Player::GiveQuestSourceItem( Quest const *pQuest )
         if( count <= 0 )
             count = 1;
 
-        ItemPosCountVec dest;
-        uint8 msg = CanStoreNewItem( NULL_BAG, NULL_SLOT, dest, srcitem, count );
-        if (msg == EQUIP_ERR_OK)
+        uint8 msg;
+        if (!dest)
         {
-            Item * item = StoreNewItem(dest, srcitem, true);
-            SendNewItem(item, count, true, false);
-            return true;
+            ItemPosCountVec destTemp;
+            msg = CanStoreNewItem( NULL_BAG, NULL_SLOT, destTemp, srcitem, count );
         }
+        else
+            msg = CanStoreNewItem( NULL_BAG, NULL_SLOT, *dest, srcitem, count );
+
+        if (msg == EQUIP_ERR_OK)
+            return true;
         // player already have max amount required item, just report success
         else if (msg == EQUIP_ERR_CANT_CARRY_MORE_OF_THIS)
             return true;
@@ -14183,6 +14174,22 @@ bool Player::GiveQuestSourceItem( Quest const *pQuest )
 
     return true;
 }
+
+void Player::GiveQuestSourceItem( Quest const *pQuest )
+{
+    ItemPosCountVec dest;
+
+    if (CanGiveQuestSourceItem(pQuest, &dest) && !dest.empty())
+    {
+        uint32 count = 0;
+        for(ItemPosCountVec::const_iterator c_itr = dest.begin(); c_itr != dest.end(); ++c_itr)
+            count += c_itr->count;
+
+        Item * item = StoreNewItem(dest, pQuest->GetSrcItemId(), true);
+        SendNewItem(item, count, true, false);
+    }
+}
+
 
 bool Player::TakeQuestSourceItem( uint32 quest_id, bool msg )
 {
