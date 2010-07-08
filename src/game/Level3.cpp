@@ -6585,8 +6585,12 @@ bool ChatHandler::HandleFreezeCommand(const char *args)
                     eff == SPELL_EFFECT_PERSISTENT_AREA_AURA || eff == SPELL_EFFECT_APPLY_AREA_AURA_FRIEND || 
                     eff == SPELL_EFFECT_APPLY_AREA_AURA_ENEMY)
                 {
-                    Aura *Aur = CreateAura(spellInfo, SpellEffectIndex(i), NULL, player);
-                    player->AddAura(Aur);
+					SpellAuraHolder *holder = NULL;
+					if (IsSpellAppliesAura(spellInfo, (1 << EFFECT_INDEX_0) | (1 << EFFECT_INDEX_1) | (1 << EFFECT_INDEX_2)) || IsSpellHaveEffect(spellInfo, SPELL_EFFECT_PERSISTENT_AREA_AURA))
+					holder = CreateSpellAuraHolder(spellInfo, player, m_session->GetPlayer());
+                    Aura *Aur = CreateAura(spellInfo, SpellEffectIndex(i), NULL, holder, player);
+                    holder->AddAura(Aur, SpellEffectIndex(i));
+					player->AddSpellAuraHolder(holder);
                 }
             }
         }
