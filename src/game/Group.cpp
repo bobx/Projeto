@@ -308,6 +308,10 @@ bool Group::AddMember(const uint64 &guid, const char* name)
 
 uint32 Group::RemoveMember(const uint64 &guid, const uint8 &method)
 {
+	// Frozen Mod
+	BroadcastGroupUpdate();
+	// Frozen Mod
+	
     // remove member and change leader (if need) only if strong more 2 members _before_ member remove
     if(GetMembersCount() > uint32(isBGGroup() ? 1 : 2))           // in BG group case allow 1 members group
     {
@@ -1744,6 +1748,36 @@ void Group::_homebindIfInstance(Player *player)
         }
     }
 }
+//Frozen Mod
+void Group::BroadcastGroupUpdate(void)
+{
+	for(member_citerator citr = m_memberSlots.begin(); citr != m_memberSlots.end(); ++citr)
+	{
+		Player *pp = sObjectMgr.GetPlayer(citr->guid);
+		if(pp && pp->IsInWorld())
+		{
+			pp->ForceValuesUpdateAtIndex(UNIT_FIELD_BYTES_2);
+			pp->ForceValuesUpdateAtIndex(UNIT_FIELD_FACTIONTEMPLATE);
+			DEBUG_LOG("-- Forced group value update for '%s'", pp->GetName());
+			if(pp->GetPet())
+			{
+				pp->GetPet()->ForceValuesUpdateAtIndex(UNIT_FIELD_BYTES_2);
+				pp->GetPet()->ForceValuesUpdateAtIndex(UNIT_FIELD_FACTIONTEMPLATE);
+				DEBUG_LOG("-- Forced group value update for '%s' pet '%s'", pp->GetName(), pp->GetPet()->GetName());
+			}
+			for(uint32 i = 0; i < MAX_TOTEM_SLOT; ++i)
+			{
+				if(Unit *totem = Unit::GetUnit(*pp, pp->m_TotemSlot[i]))
+				{
+					totem->ForceValuesUpdateAtIndex(UNIT_FIELD_BYTES_2);
+					totem->ForceValuesUpdateAtIndex(UNIT_FIELD_FACTIONTEMPLATE);
+					DEBUG_LOG("-- Forced group value update for '%s' totem #%u", pp->GetName(), i);
+				}
+			}
+		}
+	}
+}
+// Frozen Mod
 
 static void RewardGroupAtKill_helper(Player* pGroupGuy, Unit* pVictim, uint32 count, bool PvP, float group_rate, uint32 sum_level, bool is_dungeon, Player* not_gray_member_with_max_level, Player* member_with_max_level, uint32 xp )
 {
