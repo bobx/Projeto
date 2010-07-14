@@ -1304,6 +1304,7 @@ void World::SetInitialWorldSettings()
     Player::DeleteOldCharacters();
 
     sLog.outString( "WORLD: World initialized" );
+	sLog.outString( "Powered by Pandore Core system" );
 
     uint32 uStartInterval = getMSTimeDiff(uStartTime, getMSTime());
     sLog.outString( "SERVER STARTUP TIME: %i minutes %i seconds", uStartInterval / 60000, (uStartInterval % 60000) / 1000 );

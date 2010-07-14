@@ -149,6 +149,7 @@ extern int main(int argc, char **argv)
     }
 
     sLog.outString( "%s [world-daemon]", _FULLVERSION(REVISION_DATE,REVISION_TIME,REVISION_NR,REVISION_ID) );
+	sLog.outString( "Powered by PaNDORe Core System" );
     sLog.outString( "<Ctrl-C> pour stoper.\n\n" );
 
     sLog.outTitle( "PPPPPPP                   NN   NN            OOOO");
