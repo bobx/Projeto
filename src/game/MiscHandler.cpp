@@ -41,7 +41,6 @@
 #include "Pet.h"
 #include "SocialMgr.h"
 #include "DBCEnums.h"
-#include "Config/Config.h"
 
 void WorldSession::HandleRepopRequestOpcode( WorldPacket & recv_data )
 {
@@ -268,7 +267,6 @@ void WorldSession::HandleLogoutRequestOpcode( WorldPacket & /*recv_data*/ )
     //Can not logout if...
     if( GetPlayer()->isInCombat() ||                        //...is in combat
         GetPlayer()->duel         ||                        //...is in Duel
-		 GetPlayer() -> HasAura( 9454, SpellEffectIndex( 0 ))         ||             //...is frozen by GM
                                                             //...is jumping ...is falling
         GetPlayer()->m_movementInfo.HasMovementFlag(MovementFlags(MOVEFLAG_FALLING | MOVEFLAG_FALLINGFAR)))
     {
@@ -284,29 +282,6 @@ void WorldSession::HandleLogoutRequestOpcode( WorldPacket & /*recv_data*/ )
     if (GetPlayer()->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING) || GetPlayer()->isInFlight() ||
         GetSecurity() >= (AccountTypes)sWorld.getConfig(CONFIG_UINT32_INSTANT_LOGOUT))
     {
-	bool Annonce = sConfig.GetBoolDefault("AnnonceMJ",true);
-	if(Annonce)
-		{
-	switch(GetSecurity())
-		{
-		case 1:
-		sWorld.SendWorldText(LANG_GMLOGOUT_MOD, GetPlayer()->GetName());
-		break;
-		case 2:
-		sWorld.SendWorldText(LANG_GMLOGOUT_MJ, GetPlayer()->GetName());
-		break;
-		case 3:
-		sWorld.SendWorldText(LANG_GMLOGOUT_DBG, GetPlayer()->GetName());
-		break;
-		case 4:
-		sWorld.SendWorldText(LANG_GMLOGOUT_ADM, GetPlayer()->GetName());
-		break;
-		case 5:
-		sWorld.SendWorldText(LANG_GMLOGOUT_SYS, GetPlayer()->GetName());
-		break;
-		}
-		sLog.outBasic("MJ '%s' dÃƒÂ©connectÃƒÂ© et annoncÃƒÂ©",GetPlayer()->GetName());
-		}
         LogoutPlayer(true);
         return;
     }

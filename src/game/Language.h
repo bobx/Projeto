@@ -21,42 +21,6 @@
 
 enum MangosStrings
 {
-	    // Added by WarHead for the Jail
-    LANG_JAIL_YOURE_JAILED              = 950,  // "You are jailed by %s for %u hour(s)!"
-    LANG_JAIL_REASON                    = 951,  // "%s wrote this as reason: %s"
-    LANG_JAIL_WAS_JAILED                = 952,  // "%s was jailed by you for %u hour(s)!"
-    LANG_JAIL_YOURE_UNJAILED            = 953,  // "You was released out of the jail by %s."
-    LANG_JAIL_WAS_UNJAILED              = 954,  // "You have released %s out of the jail."
-    LANG_JAIL_NOREASON                  = 955,  // "No reason given or reason is < %u chars!"
-    LANG_JAIL_NONAME                    = 956,  // "No name given!"
-    LANG_JAIL_NOTIME                    = 957,  // "No time given!"
-    LANG_JAIL_VALUE                     = 958,  // "The jailtime must be between 1 and %u hours!"
-    LANG_JAIL_CHAR_NOTJAILED            = 959,  // "The character (%s) is not jailed!"
-    LANG_JAIL_DENIED                    = 960,  // "Command forbidden for jailed characters!"
-    LANG_JAIL_JAILED_H_INFO             = 961,  // "You have %u hour(s) left in the jail."
-    LANG_JAIL_JAILED_M_INFO             = 962,  // "You have %u minute(s) left in the jail."
-    LANG_JAIL_NOTJAILED_INFO            = 963,  // "You're a free woman / man. ;-)"
-    LANG_JAIL_GM_INFO                   = 964,  // "%s was %u times jailed and has %u minute(s) left. Last time jailed by %s. Last reason was: '%s'"
-    LANG_JAIL_GM_NOINFO                 = 965,  // "%s was never jailed."
-    LANG_JAIL_NO_JAIL                   = 966,  // "You can't jail yourself!"
-    LANG_JAIL_NO_UNJAIL                 = 967,  // "You can't unjail yourself!"
-    LANG_JAIL_WARNING                   = 968,  // "Be carefull! Only one more jailtime and your current character will be deleted!"
-    LANG_JAIL_ANNOUNCE1                 = 969,  // "The character '"
-    LANG_JAIL_ANNOUNCE2                 = 970,  // "' was jailed for "
-    LANG_JAIL_ANNOUNCE3                 = 971,  // " hour(s) by the GM character '"
-    LANG_JAIL_ANNOUNCE4                 = 972,  // "'. The reason is: "
-    LANG_JAIL_RELOAD                    = 973,  // "The jail configuration was reloaded."
-    LANG_JAIL_CONF_LOADED               = 974,  // ">> Jail config loaded."
-    LANG_JAIL_CONF_ERR1                 = 975,  // "Can't load jail config! Table empty or missed! Use jail_conf.sql!"
-    LANG_JAIL_CONF_ERR2                 = 976,  // "Set all jail config settings to default..."
-    LANG_JAIL_CHAR_TELE                 = 977,  // "The Character '%s' (GUID %u) is jailed and teleportet into the jail."
-    LANG_JAIL_CHAR_FREE                 = 978,  // "The Character '%s' (GUID %u) was released out of the jail."
-    LANG_JAIL_WRONG_NAME                = 979,  // "A character with this name doesn't exists!"
-    LANG_JAIL_WARNING_BAN               = 980,  // "Be carefull! Only one more jailtime and your account will be banned!"
-    LANG_JAIL_BAN_REASON                = 981,  // "Max. jailtimes reached!"
-    LANG_JAIL_BAN_BY                    = 982,  // "Robotron"
-	LANG_JAIL_AMNESTII					= 983,  // "AMNESTII"
-
     // for chat commands
     LANG_SELECT_CHAR_OR_CREATURE        = 1,
     LANG_SELECT_CREATURE                = 2,
@@ -901,31 +865,6 @@ enum MangosStrings
     //                                    10000-10999
 
     // Use for custom patches             11000-11999
-	//For GM Announce and GM Stat
-	LANG_ANNOUNCE_MOD                 	= 11000,
-	LANG_ANNOUNCE_MJ                 	= 11001,
-	LANG_ANNOUNCE_DBG                 	= 11002,
-	LANG_ANNOUNCE_ADM                 	= 11003,
-	LANG_ANNOUNCE_SYS                 	= 11004,
-	LANG_ANNOUNCE_DEF                 	= 11005,
-	LANG_GMLOGIN_MOD                 	= 11006,
-	LANG_GMLOGIN_MJ                 	= 11007,
-	LANG_GMLOGIN_DBG                 	= 11008,
-	LANG_GMLOGIN_ADM                 	= 11009,
-	LANG_GMLOGIN_SYS                 	= 11010,
-	LANG_GMLOGOUT_MOD                 	= 11011,
-	LANG_GMLOGOUT_MJ                 	= 11012,
-	LANG_GMLOGOUT_DBG                 	= 11013,
-	LANG_GMLOGOUT_ADM                 	= 11014,
-	LANG_GMLOGOUT_SYS                 	= 11015,
-	//For Freeze player command
-	LANG_COMMAND_FREEZE                 = 11016,
-    LANG_COMMAND_FREEZE_ERROR           = 11017,
-    LANG_COMMAND_FREEZE_WRONG           = 11018,
-    LANG_COMMAND_UNFREEZE               = 11019,
-    LANG_COMMAND_NO_FROZEN_PLAYERS      = 11020,
-    LANG_COMMAND_LIST_FREEZE            = 11021,
-    LANG_COMMAND_FROZEN_PLAYERS         = 11022,
 
     // NOT RESERVED IDS                   12000-1999999999
     // `db_script_string` table index     2000000000-2000009999 (MIN_DB_SCRIPT_STRING_ID-MAX_DB_SCRIPT_STRING_ID)

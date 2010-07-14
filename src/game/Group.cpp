@@ -308,22 +308,11 @@ bool Group::AddMember(const uint64 &guid, const char* name)
 
 uint32 Group::RemoveMember(const uint64 &guid, const uint8 &method)
 {
-	// Monkey
-	if (sWorld.getConfig(CONFIG_BOOL_INTERFACTION)) {
-		BroadcastGroupUpdate();
-	}
-	// Monkey
-
     // remove member and change leader (if need) only if strong more 2 members _before_ member remove
     if(GetMembersCount() > uint32(isBGGroup() ? 1 : 2))           // in BG group case allow 1 members group
     {
         bool leaderChanged = _removeMember(guid);
-		
-	// Monkey
-	if (sWorld.getConfig(CONFIG_BOOL_INTERFACTION)) {
-		// Player *player = sObjectMgr.GetPlayer(guid);
-	}
-	// Monkey
+
         if(Player *player = sObjectMgr.GetPlayer( guid ))
         {
             // quest related GO state dependent from raid membership
@@ -1847,18 +1836,3 @@ void Group::RewardGroupAtKill(Unit* pVictim, Player* player_tap)
         }
     }
 }
-
-// Monkey
-void Group::BroadcastGroupUpdate(void)
-{
-	for(member_citerator citr = m_memberSlots.begin(); citr != m_memberSlots.end(); ++citr)
-	{
-	Player *pp = sObjectMgr.GetPlayer(citr->guid);
-	if(pp && pp->IsInWorld())
-		{
-			pp->ForceValuesUpdateAtIndex(UNIT_FIELD_BYTES_2);
-			pp->ForceValuesUpdateAtIndex(UNIT_FIELD_FACTIONTEMPLATE);
-		}
-	}
-}
-// Monkey

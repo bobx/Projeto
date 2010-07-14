@@ -465,7 +465,6 @@ class ChatHandler
         bool HandleGonameCommand(const char* args);
         bool HandleGroupgoCommand(const char* args);
         bool HandleRecallCommand(const char* args);
-		bool HandleSysAnnounceCommand(const char* args);
         bool HandleAnnounceCommand(const char* args);
         bool HandleNotifyCommand(const char* args);
         bool HandleGPSCommand(const char* args);
@@ -514,19 +513,10 @@ class ChatHandler
         bool HandleRespawnCommand(const char* args);
         bool HandleComeToMeCommand(const char *args);
         bool HandleCombatStopCommand(const char *args);
-		 bool HandleFreezeCommand(const char *args);
-        bool HandleUnFreezeCommand(const char *args);
-        bool HandleListFreezeCommand(const char* args);
         bool HandleFlushArenaPointsCommand(const char *args);
         bool HandleRepairitemsCommand(const char* args);
         bool HandleWaterwalkCommand(const char* args);
         bool HandleQuitCommand(const char* args);
-
- 		// Jail by WarHead
-        bool HandleJailCommand(const char* args);
-        bool HandleJailInfoCommand(const char* args);
-        bool HandleUnJailCommand(const char* args);
-        bool HandleJailReloadCommand(const char* args);
 
         //! Development Commands
         bool HandleSaveAllCommand(const char* args);

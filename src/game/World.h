@@ -78,8 +78,7 @@ enum WorldTimers
     WUPDATE_CORPSES     = 5,
     WUPDATE_EVENTS      = 6,
     WUPDATE_DELETECHARS = 7,
-	WUPDATE_EXT_MAIL    = 8,
-    WUPDATE_COUNT       = 9
+    WUPDATE_COUNT       = 8
 };
 
 /// Configuration elements
@@ -183,10 +182,6 @@ enum eConfigUInt32Values
     CONFIG_UINT32_CHARDELETE_KEEP_DAYS,
     CONFIG_UINT32_CHARDELETE_METHOD,
     CONFIG_UINT32_CHARDELETE_MIN_LEVEL,
-    // External Mail
-    CONFIG_UINT32_EXTERNAL_MAIL,
-    CONFIG_UINT32_EXTERNAL_MAIL_INTERVAL,
-
     CONFIG_UINT32_VALUE_COUNT
 };
 
@@ -285,7 +280,6 @@ enum eConfigBoolValues
     CONFIG_BOOL_ALLOW_TWO_SIDE_INTERACTION_MAIL,
     CONFIG_BOOL_ALLOW_TWO_SIDE_WHO_LIST,
     CONFIG_BOOL_ALLOW_TWO_SIDE_ADD_FRIEND,
-	 CONFIG_BOOL_INTERFACTION,
     CONFIG_BOOL_INSTANCE_IGNORE_LEVEL,
     CONFIG_BOOL_INSTANCE_IGNORE_RAID,
     CONFIG_BOOL_CAST_UNSTUCK,
@@ -641,7 +635,7 @@ class World
 
         time_t m_startTime;
         time_t m_gameTime;
-        IntervalTimer m_timers[WUPDATE_COUNT];		
+        IntervalTimer m_timers[WUPDATE_COUNT];
         uint32 mail_timer;
         uint32 mail_timer_expires;
 

@@ -5401,16 +5401,7 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
         {
             switch(m_spellInfo->Id)
             {
-                // Summon Ghouls On Scarlet Crusade
-                case 51904:
-                {
-                    if(!unitTarget)
-                        return;
-
-                    unitTarget->CastSpell(unitTarget, 54522, true);
-                    break;
-                }
-                                case 8856:                                  // Bending Shinbone
+                case 8856:                                  // Bending Shinbone
                 {
                     if (!itemTarget && m_caster->GetTypeId()!=TYPEID_PLAYER)
                         return;

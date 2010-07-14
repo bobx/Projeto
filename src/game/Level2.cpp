@@ -36,14 +36,11 @@
 #include "AccountMgr.h"
 #include "GMTicketMgr.h"
 #include "WaypointManager.h"
-#include "WaypointMovementGenerator.h"
-#include "math.h"
 #include "Util.h"
 #include <cctype>
 #include <iostream>
 #include <fstream>
 #include <map>
-#include "Config/Config.h"
 
 #include "TargetedMovementGenerator.h"                      // for HandleNpcUnFollowCommand
 
@@ -2147,7 +2144,6 @@ bool ChatHandler::HandleModifyPhaseCommand(const char* args)
 bool ChatHandler::HandlePInfoCommand(const char* args)
 {
     Player* target;
-	char* py = NULL;
     uint64 target_guid;
     std::string target_name;
     if (!extractPlayerTarget((char*)args, &target, &target_guid,& target_name))
@@ -2158,7 +2154,6 @@ bool ChatHandler::HandlePInfoCommand(const char* args)
     uint32 total_player_time = 0;
     uint32 level = 0;
     uint32 latency = 0;
-    uint32 realmID = sConfig.GetIntDefault("RealmId", 0);
 
     // get additional information from Player object
     if (target)
@@ -2197,20 +2192,13 @@ bool ChatHandler::HandlePInfoCommand(const char* args)
     std::string last_ip = GetMangosString(LANG_ERROR);
     AccountTypes security = SEC_PLAYER;
     std::string last_login = GetMangosString(LANG_ERROR);
-		//                                             	0			1			2			3			4					5			6
-    QueryResult* result = LoginDatabase.PQuery("SELECT a.username, a.gmlevel, a.last_ip, a.last_login, a_fp.accountid, a_fp.security, a_fp.realmid FROM account AS a LEFT JOIN account_forcepermission AS a_fp on a.id = a_fp.accountid WHERE a.id = '%u'", accId);
-     if(result)
+
+    QueryResult* result = LoginDatabase.PQuery("SELECT username,gmlevel,last_ip,last_login FROM account WHERE id = '%u'",accId);
+    if (result)
     {
         Field* fields = result->Fetch();
         username = fields[0].GetCppString();
-        if( fields[4].GetUInt32() != NULL )                                     // checking to see if there is any data in the account_forcepermission for account
-               {
-                       if( fields[6].GetUInt32() == realmID )                  // checks to see if there are forced permissions on the realm
-                               security = (AccountTypes)fields[5].GetUInt16();                       // sets forced permissions
-               }
-               else
-                       security = (AccountTypes)fields[1].GetUInt32();                               // otherwise sets account permissions
-
+        security = (AccountTypes)fields[1].GetUInt32();
 
         if (GetAccessLevel() >= security)
         {
@@ -2234,44 +2222,9 @@ bool ChatHandler::HandlePInfoCommand(const char* args)
     uint32 gold = money /GOLD;
     uint32 silv = (money % GOLD) / SILVER;
     uint32 copp = (money % GOLD) % SILVER;
-    PSendSysMessage(LANG_PINFO_LEVEL,  timeStr.c_str(), level, gold,silv,copp );
-	if (py && strncmp(py, "jail", 4) == 0)
-    {
-        if (target->m_jail_times > 0)
-        {
-            if(target->m_jail_release > 0)
-            {
-                time_t localtime;
-                localtime = time(NULL);
-                uint32 min_left = (uint32)floor(float(target->m_jail_release - localtime) / 60);
- 
-               if (min_left <= 0)
-                {
-                    target->m_jail_release = 0;
-                    target->_SaveJail();
-                    PSendSysMessage(LANG_JAIL_GM_INFO, target->m_jail_char.c_str(), target->m_jail_times, 0, target->m_jail_gmchar.c_str(), target->m_jail_reason.c_str());
-                    return true;
-                }
-                else
-                {
-                    PSendSysMessage(LANG_JAIL_GM_INFO, target->m_jail_char.c_str(), target->m_jail_times, min_left, target->m_jail_gmchar.c_str(), target->m_jail_reason.c_str());
-                    return true;
-                }
-            }
-            else
-            {
-                PSendSysMessage(LANG_JAIL_GM_INFO, target->m_jail_char.c_str(), target->m_jail_times, 0, target->m_jail_gmchar.c_str(), target->m_jail_reason.c_str());
-                return true;
-            }
-        }
-        else
-        {
-            PSendSysMessage(LANG_JAIL_GM_NOINFO, target->GetName());
-            return true;
-		}
+    PSendSysMessage(LANG_PINFO_LEVEL,  timeStr.c_str(), level, gold,silv,copp);
+
     return true;
-	}
-return true;
 }
 
 //show tickets

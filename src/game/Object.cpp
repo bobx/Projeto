@@ -662,54 +662,6 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer * data, UpdateMask *
                     else
                         *data << (m_uint32Values[ index ] & ~UNIT_DYNFLAG_TAPPED);
                 }
-		// Monkey
-		 else if(sWorld.getConfig(CONFIG_BOOL_INTERFACTION) && (index == UNIT_FIELD_BYTES_2 || index == UNIT_FIELD_FACTIONTEMPLATE))
-		 {
-		     bool ch = false;
-		     if(target->GetTypeId() == TYPEID_PLAYER && GetTypeId() == TYPEID_PLAYER && target != this)
-		     {
-			 if(target->IsInSameGroupWith((Player*)this) || target->IsInSameRaidWith((Player*)this))
-			 {
-			     if(index == UNIT_FIELD_BYTES_2)
-			     {
-			DEBUG_LOG("-- VALUES_UPDATE: Sending '%s' the blue-group-fix from '%s' (flag)", target->GetName(), ((Player*)this)->GetName());
-			*data << ( m_uint32Values[ index ] & (UNIT_BYTE2_FLAG_SANCTUARY << 8) ); // this flag is at uint8 offset 1 !!
-			ch = true;
-			     }
-		     else if(index == UNIT_FIELD_FACTIONTEMPLATE)
-		     {
-			DEBUG_LOG("-- VALUES_UPDATE: Sending '%s' the blue-group-fix from '%s' (faction)", target->GetName(), ((Player*)this)->GetName());
-			if(target->getRace() == RACE_HUMAN)
-			*data << uint32(1);
-			else if(target->getRace() == RACE_ORC)
-			*data << uint32(2);
-			else if(target->getRace() == RACE_DWARF)			
-			*data << uint32(3);
-			else if(target->getRace() == RACE_NIGHTELF)			
-			*data << uint32(4);
-			else if(target->getRace() == RACE_UNDEAD_PLAYER)			
-			*data << uint32(5);
-			else if(target->getRace() == RACE_TAUREN)			
-			*data << uint32(6);
-			else if(target->getRace() == RACE_GNOME)			
-			*data << uint32(115);
-			else if(target->getRace() == RACE_TROLL)
-			*data << uint32(116);
-			else if(target->getRace() == RACE_BLOODELF)
-			*data << uint32(1610);
-			else if(target->getRace() == RACE_DRAENEI)
-			*data << uint32(1629);
-			ch = true;
-		     }
-
-		 }
-     }
-		     if(!ch)
-			 *data << m_uint32Values[ index ];
-
-		 }
-		// Monkey
-
                 else
                 {
                     // send in current format (float as float, uint32 as uint32)
@@ -1476,7 +1428,7 @@ void WorldObject::UpdateGroundPositionZ(float x, float y, float &z) const
 {
     float new_z = GetBaseMap()->GetHeight(x,y,z,true);
     if(new_z > INVALID_HEIGHT)
-        z = new_z; //+ 0.05f;                                   // just to be sure that we are not a few pixel under the surface
+        z = new_z+ 0.05f;                                   // just to be sure that we are not a few pixel under the surface
 }
 
 bool WorldObject::IsPositionValid() const
@@ -1713,22 +1665,6 @@ Creature* WorldObject::SummonCreature(uint32 id, float x, float y, float z, floa
     return pCreature;
 }
 
-// Monkey
-void Object::ForceValuesUpdateAtIndex(uint32 i)
-{
-    m_uint32Values_mirror[i] = GetUInt32Value(i) + 1; // makes server think the field changed
-    if(m_inWorld)
-    {
-        if(!m_objectUpdated)
-        {
-            //ObjectAccessor::Instance().AddUpdateObject(this);
-			AddToClientUpdateList();
-            m_objectUpdated = true;
-        }
-    }
-}
-// Monkey
-
 namespace MaNGOS
 {
     class NearUsedPosDo
@@ -1865,12 +1801,7 @@ void WorldObject::GetNearPoint(WorldObject const* searcher, float &x, float &y, 
 
     // set first used pos in lists
     selector.InitializeAngle();
-	
-	// Debugging LoS problem when angle == 0.00, set some vars
-    bool localDebug = false;
-    uint32 localCounter = 0;
-    uint32 localCounter2 = 0;
-	
+
     // select in positions after current nodes (selection one by one)
     while(selector.NextAngle(angle))                        // angle for free pos
     {
@@ -1880,97 +1811,53 @@ void WorldObject::GetNearPoint(WorldObject const* searcher, float &x, float &y, 
 
         if(IsWithinLOS(x,y,z))
             return;
-			
-			// Start outputting debug when angle == 0.00
-        if(!angle && !localCounter) {
-                sLog.outError("WorldObject::GetNearPoint: DEBUG START (angle = %f, map_id = %u, x = %f, y = %f, z = %f)", angle, GetMapId(), x, y, z);
-                localDebug = true;
-        }
-        
-        if(++localCounter > 100) {
-            sLog.outError("WorldObject::GetNearPoint: FIRST WHILE LOOP more then 100 iterations, BREAK (angle = %f, map_id = %u, x = %f, y = %f, z = %f)", angle, GetMapId(), x, y, z);
-            break;
-        }
     }
 
     // BAD NEWS: not free pos (or used or have LOS problems)
     // Attempt find _used_ pos without LOS problem
-	
-	if(localDebug) sLog.outError("WorldObject::GetNearPoint: CHECKPOINT 1 (angle = %f, map_id = %u, x = %f, y = %f, z = %f)", angle, GetMapId(), x, y, z);
 
     if(!first_los_conflict)
     {
-		if(localDebug) sLog.outError("WorldObject::GetNearPoint: CHECKPOINT 1A (angle = %f, map_id = %u, x = %f, y = %f, z = %f)", angle, GetMapId(), x, y, z);
- 
         x = first_x;
         y = first_y;
 
         UpdateGroundPositionZ(x,y,z);                       // update to LOS height if available
-
-		if(localDebug) sLog.outError("WorldObject::GetNearPoint: RETURN POINT 1 (angle = %f, map_id = %u, x = %f, y = %f, z = %f)", angle, GetMapId(), x, y, z);
         return;
     }
-	
-	if(localDebug) sLog.outError("WorldObject::GetNearPoint: CHECKPOINT 2 (angle = %f, map_id = %u, x = %f, y = %f, z = %f)", angle, GetMapId(), x, y, z);
 
     // special case when one from list empty and then empty side preferred
     if( selector.IsNonBalanced() )
     {
-		if(localDebug) sLog.outError("WorldObject::GetNearPoint: CHECKPOINT 2A (angle = %f, map_id = %u, x = %f, y = %f, z = %f)", angle, GetMapId(), x, y, z);
-
         if(!selector.FirstAngle(angle))                     // _used_ pos
         {
-			if(localDebug) sLog.outError("WorldObject::GetNearPoint: CHECKPOINT 2B (angle = %f, map_id = %u, x = %f, y = %f, z = %f)", angle, GetMapId(), x, y, z);
-
             GetNearPoint2D(x,y,distance2d,absAngle+angle);
             z = GetPositionZ();
             UpdateGroundPositionZ(x,y,z);                   // update to LOS height if available
 
-            if(IsWithinLOS(x,y,z)) {
-                if(localDebug) sLog.outError("WorldObject::GetNearPoint: RETURN POINT 2 (angle = %f, map_id = %u, x = %f, y = %f, z = %f)", angle, GetMapId(), x, y, z);
-
+            if(IsWithinLOS(x,y,z))
                 return;
-			}
         }
     }
-	
-	if(localDebug) sLog.outError("WorldObject::GetNearPoint: CHECKPOINT 3 (angle = %f, map_id = %u, x = %f, y = %f, z = %f)", angle, GetMapId(), x, y, z);
 
     // set first used pos in lists
     selector.InitializeAngle();
 
-	if(localDebug) sLog.outError("WorldObject::GetNearPoint: CHECKPOINT 4 (angle = %f, map_id = %u, x = %f, y = %f, z = %f)", angle, GetMapId(), x, y, z);
-
     // select in positions after current nodes (selection one by one)
     while(selector.NextUsedAngle(angle))                    // angle for used pos but maybe without LOS problem
     {
-		if(localDebug) sLog.outError("WorldObject::GetNearPoint: CHECKPOINT 4A (angle = %f, map_id = %u, x = %f, y = %f, z = %f)", angle, GetMapId(), x, y, z);
-
         GetNearPoint2D(x,y,distance2d,absAngle+angle);
         z = GetPositionZ();
         UpdateGroundPositionZ(x,y,z);                       // update to LOS height if available
 
-        if(IsWithinLOS(x,y,z)) {
-            if(localDebug) sLog.outError("WorldObject::GetNearPoint: RETURN POINT 3 (angle = %f, map_id = %u, x = %f, y = %f, z = %f)", angle, GetMapId(), x, y, z);
-
+        if(IsWithinLOS(x,y,z))
             return;
-		}
-        
-        if(++localCounter2 > 100) {
-            sLog.outError("WorldObject::GetNearPoint: SECOND WHILE LOOP more then 100 iterations, BREAK (angle = %f, map_id = %u, x = %f, y = %f, z = %f)", angle, GetMapId(), x, y, z);
-            break;
-        }
     }
-
-	if(localDebug) sLog.outError("WorldObject::GetNearPoint: CHECKPOINT 5 (angle = %f, map_id = %u, x = %f, y = %f, z = %f)", angle, GetMapId(), x, y, z);
 
     // BAD BAD NEWS: all found pos (free and used) have LOS problem :(
     x = first_x;
     y = first_y;
 
     UpdateGroundPositionZ(x,y,z);                           // update to LOS height if available
-
-	if(localDebug) sLog.outError("WorldObject::GetNearPoint: RETURN POINT 4 (angle = %f, map_id = %u, x = %f, y = %f, z = %f)", angle, GetMapId(), x, y, z);
 }
 
 void WorldObject::SetPhaseMask(uint32 newPhaseMask, bool update)
