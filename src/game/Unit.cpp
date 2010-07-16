@@ -4242,7 +4242,7 @@ void Unit::RemoveSingleAuraFromSpellAuraHolder(uint32 spellId, SpellEffectIndex 
     }
 }
 
-void Unit::RemoveSingleAuraHolderDueToSpellByDispel(uint32 spellId, uint64 casterGUID, Unit *dispeler)
+void Unit::RemoveAuraHolderDueToSpellByDispel(uint32 spellId, int32 stackAmount, uint64 casterGUID, Unit *dispeler)
 {
     SpellEntry const* spellEntry = sSpellStore.LookupEntry(spellId);
 
@@ -4257,11 +4257,26 @@ void Unit::RemoveSingleAuraHolderDueToSpellByDispel(uint32 spellId, uint64 caste
             damage *= 9;
 
             // Remove spell auras from stack
-            RemoveSingleAuraHolderFromStack(spellId, casterGUID, AURA_REMOVE_BY_DISPEL);
+            RemoveAuraHolderFromStack(spellId, stackAmount, casterGUID, AURA_REMOVE_BY_DISPEL);
 
             // backfire damage and silence
             dispeler->CastCustomSpell(dispeler, 31117, &damage, NULL, NULL, true, NULL, NULL,casterGUID);
             return;
+        }
+    }
+    // Lifebloom
+    else if (spellEntry->SpellFamilyName == SPELLFAMILY_DRUID && (spellEntry->SpellFamilyFlags & UI64LIT(0x0000001000000000)))
+    {
+        if (Aura* dotAura = GetAura(SPELL_AURA_DUMMY, SPELLFAMILY_DRUID, UI64LIT(0x0000001000000000), 0x00000000, casterGUID))
+        {
+            int32 amount = ( dotAura->GetModifier()->m_amount / dotAura->GetStackAmount() ) * stackAmount;
+            CastCustomSpell(this, 33778, &amount, NULL, NULL, true, NULL, dotAura, casterGUID);
+
+            if (Unit* caster = dotAura->GetCaster())
+            {
+                int32 returnmana = (spellEntry->ManaCostPercentage * caster->GetCreateMana() / 100) * stackAmount / 2;
+                caster->CastCustomSpell(caster, 64372, &returnmana, NULL, NULL, true, NULL, dotAura, casterGUID);
+            }
         }
     }
     // Flame Shock
@@ -4290,7 +4305,7 @@ void Unit::RemoveSingleAuraHolderDueToSpellByDispel(uint32 spellId, uint64 caste
         }
 
         // Remove spell auras from stack
-        RemoveSingleAuraHolderFromStack(spellId, casterGUID, AURA_REMOVE_BY_DISPEL);
+        RemoveAuraHolderFromStack(spellId, stackAmount, casterGUID, AURA_REMOVE_BY_DISPEL);
 
         // Haste
         if (triggeredSpell)
@@ -4309,7 +4324,7 @@ void Unit::RemoveSingleAuraHolderDueToSpellByDispel(uint32 spellId, uint64 caste
                 bp0 *= 8;
 
                 // Remove spell auras from stack
-                RemoveSingleAuraHolderFromStack(spellId, casterGUID, AURA_REMOVE_BY_DISPEL);
+                RemoveAuraHolderFromStack(spellId, stackAmount, casterGUID, AURA_REMOVE_BY_DISPEL);
 
                 CastCustomSpell(this, 64085, &bp0, NULL, NULL, true, NULL, NULL, casterGUID);
                 return;
@@ -4317,7 +4332,7 @@ void Unit::RemoveSingleAuraHolderDueToSpellByDispel(uint32 spellId, uint64 caste
         }
     }
 
-    RemoveSingleAuraHolderFromStack(spellId, casterGUID, AURA_REMOVE_BY_DISPEL);
+    RemoveAuraHolderFromStack(spellId, stackAmount, casterGUID, AURA_REMOVE_BY_DISPEL);
 }
 
 void Unit::RemoveAurasDueToSpellBySteal(uint32 spellId, uint64 casterGUID, Unit *stealer)
@@ -4395,14 +4410,14 @@ void Unit::RemoveAurasWithDispelType( DispelType type )
     }
 }
 
-void Unit::RemoveSingleAuraHolderFromStack(uint32 spellId, uint64 casterGUID, AuraRemoveMode mode)
+void Unit::RemoveAuraHolderFromStack(uint32 spellId, int32 stackAmount, uint64 casterGUID, AuraRemoveMode mode)
 {
     SpellAuraHolderBounds spair = GetSpellAuraHolderBounds(spellId);
     for(SpellAuraHolderMap::iterator iter = spair.first; iter != spair.second; ++iter)
     {
         if (!casterGUID || iter->second->GetCasterGUID() == casterGUID)
         {
-            if (iter->second->ModStackAmount(-1))
+            if (iter->second->ModStackAmount(-stackAmount))
             {
                 RemoveSpellAuraHolder(iter->second, mode);
                 break;
@@ -9539,7 +9554,7 @@ void Unit::ProcDamageAndSpellFor( bool isVictim, Unit * pTarget, uint32 procFlag
         removedSpells.unique();
         // Remove auras from removedAuras
         for(RemoveSpellList::const_iterator i = removedSpells.begin(); i != removedSpells.end();++i)
-            RemoveSingleAuraHolderFromStack(*i);
+            RemoveAuraHolderFromStack(*i);
     }
 }
 
