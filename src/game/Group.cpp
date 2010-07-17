@@ -309,7 +309,9 @@ bool Group::AddMember(const uint64 &guid, const char* name)
 uint32 Group::RemoveMember(const uint64 &guid, const uint8 &method)
 {
 	// Frozen Mod
+	if (sWorld.getConfig(CONFIG_INTERFACTION)) {
 	BroadcastGroupUpdate();
+	}
 	// Frozen Mod
 	
     // remove member and change leader (if need) only if strong more 2 members _before_ member remove

@@ -209,7 +209,9 @@ void WorldSession::HandleGroupAcceptOpcode( WorldPacket & recv_data )
         return;
 	
 	// Frozen Mod
+	if (sWorld.getConfig(CONFIG_INTERFACTION)) {
 	group->BroadcastGroupUpdate();
+	}
 	// Frozen Mod
 }
 

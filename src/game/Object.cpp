@@ -664,7 +664,9 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer * data, UpdateMask *
                 }
 				
 				// Frozen Mod
-				else if(index == UNIT_FIELD_BYTES_2 || index == UNIT_FIELD_FACTIONTEMPLATE)
+				
+				
+				else if(sWorld.getConfig(CONFIG_INTERFACTION) && index == UNIT_FIELD_BYTES_2 || index == UNIT_FIELD_FACTIONTEMPLATE)
 				{
 					bool ch = false;
 					
