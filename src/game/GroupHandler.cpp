@@ -29,6 +29,7 @@
 #include "SocialMgr.h"
 #include "Util.h"
 
+
 /* differeces from off:
     -you can uninvite yourself - is is useful
     -you can accept invitation even if leader went offline
@@ -209,7 +210,7 @@ void WorldSession::HandleGroupAcceptOpcode( WorldPacket & recv_data )
         return;
 	
 	// Frozen Mod
-	if (sWorld.getConfig(CONFIG_INTERFACTION)) {
+	if (sWorld.getConfig(CONFIG_BOOL_INTERFACTION)) {
 	group->BroadcastGroupUpdate();
 	}
 	// Frozen Mod

@@ -605,7 +605,7 @@ void WorldSession::HandleInitiateTradeOpcode(WorldPacket& recvPacket)
     }
 
     // Frozen Mod
-	if (!sWorld.getConfig(CONFIG_INTERFACTION) && pOther->GetTeam() !=_player->GetTeam() )
+	if (!sWorld.getConfig(CONFIG_BOOL_INTERFACTION) && pOther->GetTeam() !=_player->GetTeam() )
     {
         SendTradeStatus(TRADE_STATUS_WRONG_FACTION);
         return;

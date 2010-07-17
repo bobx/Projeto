@@ -309,7 +309,7 @@ bool Group::AddMember(const uint64 &guid, const char* name)
 uint32 Group::RemoveMember(const uint64 &guid, const uint8 &method)
 {
 	// Frozen Mod
-	if (sWorld.getConfig(CONFIG_INTERFACTION)) {
+	if (sWorld.getConfig(CONFIG_BOOL_INTERFACTION)) {
 	BroadcastGroupUpdate();
 	}
 	// Frozen Mod

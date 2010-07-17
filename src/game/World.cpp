@@ -551,8 +551,8 @@ void World::LoadConfigSettings(bool reload)
     setConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_INTERACTION_MAIL,    "AllowTwoSide.Interaction.Mail", false);
     setConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_WHO_LIST,            "AllowTwoSide.WhoList", false);
     setConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_ADD_FRIEND,          "AllowTwoSide.AddFriend", false);
-	setConfig(CONFIG_INTERFACTION,							  "Interfaction", true);
-	if(getconfig(CONFIG_INTERFACTION) {
+	setConfig(CONFIG_BOOL_INTERFACTION,						  "Interfaction", false);
+	if(getConfig(CONFIG_BOOL_INTERFACTION)) {
         sLog.outString( "Interfaction Allowed" );
 	}
 	
