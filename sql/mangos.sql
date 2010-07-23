@@ -24,7 +24,7 @@ CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
   `cache_id` int(10) default '0',
-  `required_10244_01_mangos_command` bit(1) default NULL
+  `required_10252_01_mangos_reputation_reward_rate` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -788,7 +788,6 @@ INSERT INTO `command` VALUES
 ('waterwalk',2,'Syntax: .waterwalk on/off\r\n\r\nSet on/off waterwalk state for selected player.'),
 ('wchange',3,'Syntax: .wchange #weathertype #status\r\n\r\nSet current weather to #weathertype with an intensity of #status.\r\n\r\n#weathertype can be 1 for rain, 2 for snow, and 3 for sand. #status can be 0 for disabled, and 1 for enabled.'),
 ('whispers',1,'Syntax: .whispers on|off\r\nEnable/disable accepting whispers by GM from players. By default use mangosd.conf setting.'),
-('wp',2,'Using WP Command:\r\nEach Waypoint Command has it\'s own description!'),
 ('wp add',2,'Syntax: .wp add [#creature_guid or Select a Creature]'),
 ('wp export',3,'Syntax: .wp export [#creature_guid or Select a Creature] $filename'),
 ('wp import',3,'Syntax: .wp import $filename'),
@@ -14003,6 +14002,28 @@ CREATE TABLE `reference_loot_template` (
 LOCK TABLES `reference_loot_template` WRITE;
 /*!40000 ALTER TABLE `reference_loot_template` DISABLE KEYS */;
 /*!40000 ALTER TABLE `reference_loot_template` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `reputation_reward_rate`
+--
+
+DROP TABLE IF EXISTS `reputation_reward_rate`;
+CREATE TABLE `reputation_reward_rate` (
+  `faction` mediumint(8) unsigned NOT NULL default '0',
+  `quest_rate` float NOT NULL default '1',
+  `creature_rate` float NOT NULL default '1',
+  `spell_rate` float NOT NULL default '1',
+  PRIMARY KEY  (`faction`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `reputation_reward_rate`
+--
+
+LOCK TABLES `reputation_reward_rate` WRITE;
+/*!40000 ALTER TABLE `reputation_reward_rate` DISABLE KEYS */;
+/*!40000 ALTER TABLE `reputation_reward_rate` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --

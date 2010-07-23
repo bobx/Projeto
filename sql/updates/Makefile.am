@@ -120,6 +120,8 @@ pkgdata_DATA = \
 	10223_01_mangos_spell_proc_event.sql \
 	10237_01_mangos_spell_bonus_data.sql \
 	10244_01_mangos_command.sql \
+	10251_01_mangos_command.sql \
+	10252_01_mangos_reputation_reward_rate.sql \
 	README
 
 ## Additional files to include when running 'make dist'
@@ -220,4 +222,6 @@ EXTRA_DIST = \
 	10223_01_mangos_spell_proc_event.sql \
 	10237_01_mangos_spell_bonus_data.sql \
 	10244_01_mangos_command.sql \
+	10251_01_mangos_command.sql \
+	10252_01_mangos_reputation_reward_rate.sql \
 	README
