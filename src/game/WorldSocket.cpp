@@ -479,8 +479,8 @@ int WorldSocket::handle_input_header (void)
 
     if ((header.size < 4) || (header.size > 10240) || (header.cmd  > 10240))
     {
-        sLog.outError ("WorldSocket::handle_input_header: client sent malformed packet size = %d , cmd = %d",
-                       header.size, header.cmd);
+        sLog.outError ("WorldSocket::handle_input_header: client '%s' sent malformed packet size = %d , cmd = %d",
+                       GetRemoteAddress().c_str(), header.size, header.cmd);
 
         errno = EINVAL;
         return -1;
