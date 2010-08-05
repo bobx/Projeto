@@ -6573,7 +6573,7 @@ bool ChatHandler::HandleModifyGenderCommand(char *args)
     return true;
 }
 
-bool ChatHandler::HandleFreezeCommand(const char *args)
+bool ChatHandler::HandleFreezeCommand(char *args)
 {
     std::string name;
     Player* player;
@@ -6666,7 +6666,7 @@ bool ChatHandler::HandleFreezeCommand(const char *args)
     return true;
 }
 
-bool ChatHandler::HandleUnFreezeCommand(const char *args)
+bool ChatHandler::HandleUnFreezeCommand(char *args)
 {
     std::string name;
     Player* player;
@@ -6733,7 +6733,7 @@ bool ChatHandler::HandleUnFreezeCommand(const char *args)
     return true;
 }
 
-bool ChatHandler::HandleListFreezeCommand(const char* args)
+bool ChatHandler::HandleListFreezeCommand(char* args)
 {
     //Get names from DB
     QueryResult *result = CharacterDatabase.PQuery("SELECT characters.name FROM `characters` LEFT JOIN `character_aura` ON (characters.guid = character_aura.guid) WHERE character_aura.spell = 9454");
