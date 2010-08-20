@@ -5714,6 +5714,11 @@ Pet* Unit::GetPet() const
     return NULL;
 }
 
+Pet* Unit::_GetPet(ObjectGuid guid) const
+{
+    return GetMap()->GetPet(guid);
+}
+
 Unit* Unit::GetCharm() const
 {
     if (uint64 charm_guid = GetCharmGUID())
