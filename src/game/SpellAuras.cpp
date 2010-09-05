@@ -8898,14 +8898,8 @@ void SpellAuraHolder::UnregisterSingleCastHolder()
     if (IsSingleTarget())
     {
         if(Unit* caster = GetCaster())
-        {
-            caster->GetSingleCastSpellAuraHolders().remove(this);
-        }
-        else
-        {
-            sLog.outError("Couldn't find the caster of the single target aura (SpellId %u), may crash later!", GetId());
-            MANGOS_ASSERT(false);
-        }
+            caster->GetSingleCastSpellTargets().erase(GetSpellProto());
+
         m_isSingleTarget = false;
     }
 }
