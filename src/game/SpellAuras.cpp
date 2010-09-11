@@ -297,7 +297,7 @@ pAuraHandler AuraHandler[TOTAL_AURAS]=
     &Aura::HandleComprehendLanguage,                        //244 SPELL_AURA_COMPREHEND_LANGUAGE
     &Aura::HandleNoImmediateEffect,                         //245 SPELL_AURA_MOD_DURATION_OF_MAGIC_EFFECTS     implemented in Unit::CalculateSpellDuration
     &Aura::HandleNoImmediateEffect,                         //246 SPELL_AURA_MOD_DURATION_OF_EFFECTS_BY_DISPEL implemented in Unit::CalculateSpellDuration
-    &Aura::HandleNULL,                                      //247 target to become a clone of the caster
+    &Aura::HandleAuraCloneCaster,                           //247 SPELL_AURA_CLONE_CASTER
     &Aura::HandleNoImmediateEffect,                         //248 SPELL_AURA_MOD_COMBAT_RESULT_CHANCE         implemented in Unit::RollMeleeOutcomeAgainst
     &Aura::HandleAuraConvertRune,                           //249 SPELL_AURA_CONVERT_RUNE
     &Aura::HandleAuraModIncreaseHealth,                     //250 SPELL_AURA_MOD_INCREASE_HEALTH_2
@@ -7331,8 +7331,23 @@ void Aura::PeriodicDummyTick()
         case SPELLFAMILY_MAGE:
         {
             // Mirror Image
-//            if (spell->Id == 55342)
-//                return;
+            if (spell->Id == 55342)
+            {
+		// Set clone caster 
+		if (Unit *caster = GetCaster())	
+		{
+		GuardianPetList const& gurdians = caster->GetGuardians();
+
+       		for(GuardianPetList::const_iterator itr = gurdians.begin(); itr != gurdians.end(); ++itr)
+            		if(Unit* unit = ObjectAccessor::GetUnit(*caster, *itr))
+				if(unit->GetOwnerGUID()==caster->GetGUID() && unit->GetEntry()==31216)	
+					{					
+					caster->CastSpell(unit, 45204, true);			                		
+					caster->CastSpell(unit, 69837, true);
+					}
+		}		                
+                m_isPeriodic = false;
+            }
             break;
         }
         case SPELLFAMILY_DRUID:
@@ -9057,5 +9072,37 @@ void SpellAuraHolder::UnregisterSingleCastHolder()
             caster->GetSingleCastSpellTargets().erase(GetSpellProto());
 
         m_isSingleTarget = false;
+    }
+}
+
+void Aura::HandleAuraCloneCaster(bool Apply, bool Real)
+{
+    if (!Real)	
+        return;
+
+    Unit* target = GetTarget();
+
+    if (Apply)
+    {
+        Unit* caster = GetCaster();
+        if (!caster)
+            return;
+
+        target->SetDisplayId(caster->GetDisplayId());        
+
+        target->SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, DEFAULT_WORLD_OBJECT_SIZE);
+        target->SetFloatValue(UNIT_FIELD_COMBATREACH, 1.5f);
+        target->SetUInt32Value(UNIT_FIELD_BYTES_2,caster->GetUInt32Value(UNIT_FIELD_BYTES_2));
+	target->SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_CLONE_CASTER);
+
+	target->SetMaxHealth(caster->GetMaxHealth());
+        target->SetHealth(caster->GetHealth());
+        target->SetMaxPower(POWER_MANA, caster->GetMaxPower(POWER_MANA));
+        target->SetPower(POWER_MANA, caster->GetPower(POWER_MANA));
+    }
+    else
+    {
+        target->SetDisplayId(target->GetNativeDisplayId());
+        target->RemoveFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_CLONE_CASTER);
     }
 }
