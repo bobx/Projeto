@@ -3673,7 +3673,7 @@ void Unit::SetInFront(Unit const* target)
     SetOrientation(GetAngle(target));
 }
 
-void Unit::SetFacingTo(float ori)
+void Unit::SetFacingTo(float ori, bool bToSelf /*= false*/)
 {
     // update orientation at server
     SetOrientation(ori);
@@ -3681,7 +3681,7 @@ void Unit::SetFacingTo(float ori)
     // and client
     WorldPacket data;
     BuildHeartBeatMsg(&data);
-    SendMessageToSet(&data, false);
+    SendMessageToSet(&data, bToSelf);
 }
 
 // Consider move this to Creature:: since only creature appear to be able to use this
