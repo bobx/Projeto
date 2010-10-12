@@ -268,6 +268,12 @@ Unit::Unit()
     // remove aurastates allowing special moves
     for(int i=0; i < MAX_REACTIVE; ++i)
         m_reactiveTimer[i] = 0;
+
+	m_auraUpdateMask = 0;
+
+    m_vehicleGUID = 0;
+    m_vehicle = NULL;
+	m_vehicleKit = NULL;
 		
 	// Frozen Mod
 	m_spoofSamePlayerFaction = false;
