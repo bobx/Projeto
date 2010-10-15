@@ -283,9 +283,9 @@ void Vehicle::Respawn()
     InstallAllAccessories();
 }
 
-void Vehicle::setDeathState(DeathState s)                       // overwrite virtual Creature::setDeathState and Unit::setDeathState
+void Vehicle::SetDeathState(DeathState s)                       // overwrite virtual Creature::setDeathState and Unit::setDeathState
 {
-    Creature::setDeathState(s);
+    Creature::SetDeathState(s);
     if(s == JUST_DIED)
     {
         if(GetVehicleFlags() & VF_DESPAWN_NPC)
@@ -363,7 +363,7 @@ bool Vehicle::Create(uint32 guidlow, Map *map, uint32 phaseMask, uint32 Entry, u
     if(!SetVehicleId(vehicleId))
         return false;
 
-    LoadCreaturesAddon();
+    LoadCreatureAddon();
 
     m_regenHealth = false;
     m_creation_time = getMSTime();
@@ -694,7 +694,7 @@ void Vehicle::AddPassenger(Unit *unit, int8 seatId, bool force)
     unit->m_movementInfo.AddMovementFlag(MOVEFLAG_ROOT);
 
     seat->second.passenger = unit;
-    if(unit->GetTypeId() == TYPEID_UNIT && ((Creature*)unit)->isVehicle())
+    if(unit->GetTypeId() == TYPEID_UNIT && ((Creature*)unit)->IsVehicle())
     {
         if(((Vehicle*)unit)->GetEmptySeatsCount(true) == 0)
             seat->second.flags = SEAT_VEHICLE_FULL;
@@ -728,7 +728,7 @@ void Vehicle::AddPassenger(Unit *unit, int8 seatId, bool force)
                 ((Player*)unit)->SetClientControl(this, 1);
                 ((Player*)unit)->GetCamera().SetView(this);
             }
-            if(canFly() || HasAuraType(SPELL_AURA_FLY) || HasAuraType(SPELL_AURA_MOD_FLIGHT_SPEED))
+            if(CanFly() || HasAuraType(SPELL_AURA_FLY) || HasAuraType(SPELL_AURA_MOD_FLIGHT_SPEED))
             {
                 WorldPacket data3(SMSG_MOVE_SET_CAN_FLY, 12);
                 data3 << GetPackGUID();
@@ -999,7 +999,7 @@ void Vehicle::Die()
 {
     for (SeatMap::iterator itr = m_Seats.begin(); itr != m_Seats.end(); ++itr)
         if(Unit *passenger = itr->second.passenger)
-            if(((Creature*)passenger)->isVehicle())
+            if(((Creature*)passenger)->IsVehicle())
                 ((Vehicle*)passenger)->Dismiss();
     RemoveAllPassengers();
 }

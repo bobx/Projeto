@@ -318,7 +318,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
     {
         if(mover->GetTypeId() == TYPEID_UNIT)
         {
-            if(((Creature*)mover)->isVehicle() && !((Creature*)mover)->canSwim())
+            if(((Creature*)mover)->IsVehicle() && !((Creature*)mover)->CanSwim())
             {
                 // NOTE : we should enter evade mode here, but...
                 ((Vehicle*)mover)->SetSpawnDuration(1);
@@ -388,7 +388,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
         if(mover->IsInWorld())
         {
             mover->GetMap()->CreatureRelocation((Creature*)mover, movementInfo.GetPos()->x, movementInfo.GetPos()->y, movementInfo.GetPos()->z, movementInfo.GetPos()->o);
-            if(((Creature*)mover)->isVehicle())
+            if(((Creature*)mover)->IsVehicle())
                 ((Vehicle*)mover)->RellocatePassengers(mover->GetMap());
         }
     }
