@@ -505,13 +505,6 @@ bool Unit::SetPosition(float x, float y, float z, float orientation, bool telepo
     return relocate || turn;
 }
 
-void Unit::BuildHeartBeatMsg(WorldPacket *data) const
-{
-    data->Initialize(MSG_MOVE_HEARTBEAT);
-    *data << GetPackGUID();
-    ((Unit*)this)->m_movementInfo.Write(*data);
-}
-
 void Unit::SendHeartBeat(bool toSelf)
 {
     WorldPacket data(MSG_MOVE_HEARTBEAT, 64);
