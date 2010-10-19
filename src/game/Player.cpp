@@ -18224,10 +18224,12 @@ void Player::HandleStealthedUnitsDetection()
                 // send data at target visibility change (adding to client)
                 if((*i)!=this && (*i)->isType(TYPEMASK_UNIT))
                 {
+					/*origin will be fixed in the futur
                     SendAurasForTarget(*i);
                     WorldPacket data;
                     (*i)->BuildHeartBeatMsg(&data);
                     GetSession()->SendPacket(&data);
+					*/
                 }
             }
         }
@@ -19413,10 +19415,12 @@ void Player::UpdateVisibilityOf(WorldObject const* viewPoint, WorldObject* targe
             // send data at target visibility change (adding to client)
             if(target!=this && target->isType(TYPEMASK_UNIT))
             {
+				/*origin will be fixed in the futur
                 SendAurasForTarget((Unit*)target);
                 WorldPacket data;
                 ((Unit*)target)->BuildHeartBeatMsg(&data);
                 GetSession()->SendPacket(&data);
+				*/
             }
 
             if(target->GetTypeId()==TYPEID_UNIT && ((Creature*)target)->isAlive())

@@ -94,10 +94,12 @@ VisibleNotifier::Notify()
         // target aura duration for caster show only if target exist at caster client
         if ((*vItr) != &player && (*vItr)->isType(TYPEMASK_UNIT))
         {
+			/*origin will be  fixed in the futur
             player.SendAurasForTarget((Unit*)(*vItr));
             WorldPacket data;
             ((Unit*)(*vItr))->BuildHeartBeatMsg(&data);
             player.GetSession()->SendPacket(&data);
+			*/
         }
 
         // non finished movements show to player

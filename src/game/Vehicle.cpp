@@ -982,9 +982,7 @@ void Vehicle::InstallAllAccessories()
         // Enter vehicle...
         pPassenger->EnterVehicle(this, cPassanger->seat_idx, true);
         // ...and send update. Without this, client wont show this new creature/vehicle...
-        WorldPacket data;
-        pPassenger->BuildHeartBeatMsg(&data);
-        pPassenger->SendMessageToSet(&data, false);
+        pPassenger->SendHeartBeat(false);
     }
 }
 
