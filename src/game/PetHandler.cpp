@@ -657,7 +657,7 @@ void WorldSession::HandlePetCastSpellOpcode( WorldPacket& recvPacket )
 
     DEBUG_LOG("WORLD: CMSG_PET_CAST_SPELL, %s, cast_count: %u, spellid %u, unk_flags %u", guid.GetString().c_str(), cast_count, spellid, unk_flags);
 
-    if (GUID_HIPART(guid) == HIGHGUID_PLAYER)
+    if (guid.GetHigh() == HIGHGUID_PLAYER)
         return;
 
     Creature* pet = ObjectAccessor::GetAnyTypeCreature(*_player,guid);
