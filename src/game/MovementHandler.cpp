@@ -246,7 +246,6 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 
     if (!VerifyMovementInfo(movementInfo,guid,mover))
         return;
-    }
 
     /* handle special cases */
     if((movementInfo.HasMovementFlag (MOVEFLAG_ONTRANSPORT)) && (movementInfo.HasMovementFlag (MOVEFLAG_ROOT)) && (recv_data.size()==52))
@@ -319,7 +318,6 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
             }
         }
     }
-	
     /* process position-change */
     HandleMoverRelocation(movementInfo,mover,plMover);
 
