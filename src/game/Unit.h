@@ -758,6 +758,7 @@ class MovementInfo
 
             t_time(0), t_seat(-1), t_time2(0), s_pitch(0.0f), fallTime(0), u_unk1(0.0f) {}
 
+
         // Read/Write methods
         void Read(ByteBuffer &data);
         void Write(ByteBuffer &data) const;
