@@ -48,7 +48,7 @@ namespace FactorySelector
         Unit *owner=NULL;
 
         if ((creature->IsPet() && ((Pet*)creature)->isControlled() &&
-            ((owner=creature->GetOwner()) && owner->GetTypeId()==TYPEID_PLAYER)) || (creature->isCharmed() && !creature->IsVehicle()))
+            ((owner=creature->GetOwner()) && owner->GetTypeId()==TYPEID_PLAYER)) || creature->isCharmed())
 
             ai_factory = ai_registry.GetRegistryItem("PetAI");
         else if (creature->IsTotem())

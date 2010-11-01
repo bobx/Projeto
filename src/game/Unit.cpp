@@ -46,7 +46,6 @@
 #include "CellImpl.h"
 #include "Path.h"
 #include "Traveller.h"
-#include "Vehicle.h"
 #include "VMapFactory.h"
 #include "MovementGenerator.h"
 
@@ -268,12 +267,6 @@ Unit::Unit()
     // remove aurastates allowing special moves
     for(int i=0; i < MAX_REACTIVE; ++i)
         m_reactiveTimer[i] = 0;
-
-	m_auraUpdateMask = 0;
-
-    m_vehicleGUID = 0;
-    m_vehicle = NULL;
-	m_vehicleKit = NULL;
 		
 	// Frozen Mod
 	m_spoofSamePlayerFaction = false;
@@ -291,9 +284,6 @@ Unit::~Unit()
             m_currentSpells[i] = NULL;
         }
     }
-
-    if(m_vehicleKit)
-        delete m_vehicleKit;
 
     if (m_charmInfo)
         delete m_charmInfo;
@@ -446,68 +436,13 @@ void Unit::SendMonsterMoveWithSpeed(float x, float y, float z, uint32 transitTim
     SendMonsterMove(x, y, z, SPLINETYPE_NORMAL, flags, transitTime, player);
 }
 
-void Unit::SendMonsterMoveTransport(Unit *vehicle)
+void Unit::BuildHeartBeatMsg(WorldPacket *data) const
 {
-    WorldPacket data(SMSG_MONSTER_MOVE_TRANSPORT, 8+8+1+1+4*3+4+1+4+4+4+4+4*3);
-    data << GetPackGUID();
-    data << vehicle->GetPackGUID();
-    data << uint8(m_movementInfo.GetTransportSeat());
-    data << uint8(0);                                       // new in 3.1
-    data << float(vehicle->GetPositionX());
-    data << float(vehicle->GetPositionY());
-    data << float(vehicle->GetPositionZ());
-    data << uint32(getMSTime());
+    MovementFlags move_flags = GetTypeId()==TYPEID_PLAYER
+        ? ((Player const*)this)->m_movementInfo.GetMovementFlags()
+        : MOVEFLAG_NONE;
 
-    data << uint8(4);                                       // unknown
-    data << float(0);                                       // facing angle
-
-    data << uint32(/*SPLINEFLAG_UNKNOWN5*/0);
-
-    data << uint32(0);                                      // Time in between points
-    data << uint32(1);                                      // 1 single waypoint
-
-    data << float(m_movementInfo.GetTransportPos()->x);
-    data << float(m_movementInfo.GetTransportPos()->y);
-    data << float(m_movementInfo.GetTransportPos()->z);
-
-    SendMessageToSet(&data, true);
-}
-
-bool Unit::SetPosition(float x, float y, float z, float orientation, bool teleport)
-{
-    // prevent crash when a bad coord is sent by the client
-    if (!MaNGOS::IsValidMapCoord(x, y, z, orientation))
-    {
-        DEBUG_LOG("Unit::SetPosition(%f, %f, %f, %f, %d) .. bad coordinates for unit %d!", x, y, z, orientation, teleport, GetGUIDLow());
-        return false;
-    }
-
-    bool turn = GetOrientation() != orientation;
-    bool relocate = (teleport || GetPositionX() != x || GetPositionY() != y || GetPositionZ() != z);
-
-    if (turn)
-        RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TURNING);
-
-    if (relocate)
-    {
-        RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_MOVE);
-        if (GetTypeId() == TYPEID_PLAYER)
-            GetMap()->PlayerRelocation((Player*)this, x, y, z, orientation);
-        else
-            GetMap()->CreatureRelocation((Creature*)this, x, y, z, orientation);
-    }
-    else if (turn)
-        SetOrientation(orientation);
-
-    if ((relocate || turn) && GetVehicleKit())
-        GetVehicleKit()->RelocatePassengers(x, y, z, orientation);
-
-    return relocate || turn;
-}
-
-void Unit::SendHeartBeat(bool toSelf)
-{
-    WorldPacket data(MSG_MOVE_HEARTBEAT, 64);
+	data->Initialize(MSG_MOVE_HEARTBEAT, 32);
     data << GetPackGUID();
     data << m_movementInfo;
     SendMessageToSet(&data, toSelf);
