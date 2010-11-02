@@ -293,7 +293,6 @@ class MANGOS_DLL_SPEC Object
 		// Frozen Mod
 		void ForceValuesUpdateAtIndex(uint32);
 		// Frozen Mod
-		
     protected:
 
         Object ( );
@@ -497,7 +496,6 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         bool isActiveObject() const { return m_isActiveObject || m_viewPoint.hasViewers(); }
 
         ViewPoint& GetViewPoint() { return m_viewPoint; }
-
     protected:
         explicit WorldObject();
 

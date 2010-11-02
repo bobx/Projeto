@@ -4279,7 +4279,7 @@ void Spell::EffectSummonPossessed(SpellEffectIndex eff_idx)
 
     summon->addUnitState(UNIT_STAT_CONTROLLED);
     summon->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
-    summon->SetCharmerGUID(m_caster->GetGUID());
+    summon->SetCharmerGuid(m_caster->GetGUID());
     summon->setFaction(m_caster->getFaction());
 
     ((Player*)m_caster)->GetCamera().SetView(summon);
@@ -4606,7 +4606,8 @@ void Spell::DoSummonWild(SpellEffectIndex eff_idx, uint32 forceFaction)
         if(Creature *summon = m_caster->SummonCreature(creature_entry, px, py, pz, m_caster->GetOrientation(), summonType, duration))
         {
             summon->SetUInt32Value(UNIT_CREATED_BY_SPELL, m_spellInfo->Id);
-            summon->SetCreatorGuid(m_caster->GetObjectGuid());
+            summon->SetCreatorGuid(m_caster->GetObjectGuid());     //created by
+			summon->SetOwnerGuid(m_caster->GetObjectGuid());	    //summoned by
 
             if(forceFaction)
                 summon->setFaction(forceFaction);
@@ -6247,7 +6248,7 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     if(!target || target->GetTypeId() != TYPEID_PLAYER)
                         return;
 
-                    m_caster->SetCharmerGUID(0);
+                    m_caster->SetCharmerGuid(ObjectGuid());
                     target->RemoveAurasDueToSpell(51852);
                     target->SetCharm(NULL);
 
@@ -6894,10 +6895,10 @@ void Spell::EffectAddComboPoints(SpellEffectIndex /*eff_idx*/)
     if(!unitTarget)
         return;
 
-    if(damage <= 0)
+    if(m_caster->GetTypeId() != TYPEID_PLAYER)
         return;
 
-	if(m_caster->GetTypeId() != TYPEID_PLAYER)
+    if(damage <= 0)
         return;
 
     ((Player*)m_caster)->AddComboPoints(unitTarget, damage);

@@ -4073,6 +4073,7 @@ void Aura::HandleAuraModRoot(bool apply, bool Real)
             data << target->GetPackGUID();
             data << (uint32)2;
             target->SendMessageToSet(&data, true);
+
             //Clear unit movement flags
             ((Player*)target)->m_movementInfo.SetMovementFlags(MOVEFLAG_NONE);
         }
@@ -7358,7 +7359,7 @@ void Aura::PeriodicDummyTick()
 
        		for(GuardianPetList::const_iterator itr = gurdians.begin(); itr != gurdians.end(); ++itr)
             		if(Unit* unit = ObjectAccessor::GetUnit(*caster, *itr))
-				if(unit->GetOwnerGUID()==caster->GetGUID() && unit->GetEntry()==31216)	
+				if(unit->GetOwnerGuid()==caster->GetGUID() && unit->GetEntry()==31216)	
 					{					
 					caster->CastSpell(unit, 45204, true);			                		
 					caster->CastSpell(unit, 69837, true);
@@ -7604,8 +7605,7 @@ void Aura::HandleArenaPreparation(bool apply, bool Real)
 /**
  * Such auras are applied from a caster(=player) to a vehicle.
  * This has been verified using spell #49256
-*/
- 
+ */
 void Aura::HandleAuraControlVehicle(bool apply, bool Real)
 {
     if(!Real)
@@ -7636,7 +7636,6 @@ void Aura::HandleAuraControlVehicle(bool apply, bool Real)
         ((Player*)player)->ExitVehicle(vehicle);
     }
 }
-
 
 void Aura::HandleAuraOpenStable(bool apply, bool Real)
 {

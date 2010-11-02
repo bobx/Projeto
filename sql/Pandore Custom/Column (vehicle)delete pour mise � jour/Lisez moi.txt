@@ -1,2 +1,0 @@
-Employer uniquement en cas de mises à jour des tables suivantes :creature_addon, creature_template_addon, creature_template.
-Ensuite, une fois votre mise à jour terminée, réinjecter les sql(v01_vehicle_table.sql et v02_vehicle_data.sql) dans votre base de données.

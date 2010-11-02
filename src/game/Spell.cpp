@@ -242,25 +242,20 @@ void SpellCastTargets::read( ByteBuffer& data, Unit *caster )
     if( m_targetMask & (TARGET_FLAG_CORPSE | TARGET_FLAG_PVP_CORPSE ) )
         data >> m_CorpseTargetGUID.ReadAsPacked();
 
+    if( m_targetMask & TARGET_FLAG_SOURCE_LOCATION )
+    {
+        data >> m_unitTargetGUID.ReadAsPacked();
+        data >> m_srcX >> m_srcY >> m_srcZ;
+        if(!MaNGOS::IsValidMapCoord(m_srcX, m_srcY, m_srcZ))
+            throw ByteBufferException(false, data.rpos(), 0, data.size());
+    }
+
     if( m_targetMask & TARGET_FLAG_DEST_LOCATION )
     {
         data >> m_unitTargetGUID.ReadAsPacked();
         data >> m_destX >> m_destY >> m_destZ;
         if(!MaNGOS::IsValidMapCoord(m_destX, m_destY, m_destZ))
             throw ByteBufferException(false, data.rpos(), 0, data.size());
-
-        if( m_targetMask & TARGET_FLAG_SOURCE_LOCATION )
-        {
-            if(data.rpos() + 4 + 4 <= data.size())
-            {
-                data >> m_elevation >> m_speed;
-                // TODO: should also read
-                m_srcO = caster->GetOrientation();
-                //*data >> uint16 >> uint8 >> uint32 >> uint32;
-                //*data >> float >> float >> float >> float...
-            }
-        }
-
     }
 
     if( m_targetMask & TARGET_FLAG_STRING )
@@ -2357,7 +2352,7 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
         case TARGET_DYNAMIC_OBJECT_LEFT_SIDE:
         case TARGET_DYNAMIC_OBJECT_RIGHT_SIDE:
         {
-			if (!(m_targets.m_targetMask & TARGET_FLAG_DEST_LOCATION))
+            if (!(m_targets.m_targetMask & TARGET_FLAG_DEST_LOCATION))
             {
                 float angle = m_caster->GetOrientation();
                 switch(targetMode)
@@ -3349,7 +3344,7 @@ void Spell::finish(bool ok)
             }
         }
         if (needDrop)
-			((Player*)m_caster)->ClearComboPoints();
+            ((Player*)m_caster)->ClearComboPoints();
     }
 
     // potions disabled by client, send event "not in combat" if need
