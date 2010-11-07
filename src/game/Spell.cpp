@@ -4385,10 +4385,11 @@ SpellCastResult Spell::CheckCast(bool strict)
                 if (m_targets.m_targetMask == TARGET_FLAG_SELF &&
                     m_spellInfo->EffectImplicitTargetA[EFFECT_INDEX_1] == TARGET_CHAIN_DAMAGE)
                 {
-                    if (target = m_caster->GetMap()->GetUnit(((Player *)m_caster)->GetSelectionGuid()))
-                        m_targets.setUnitTarget(target);
-                    else
+                    target = m_caster->GetMap()->GetUnit(((Player *)m_caster)->GetSelectionGuid());
+                    if (!target)
                         return SPELL_FAILED_BAD_TARGETS;
+
+                    m_targets.setUnitTarget(target);
                 }
             }
 
@@ -4954,9 +4955,9 @@ SpellCastResult Spell::CheckCast(bool strict)
             case SPELL_EFFECT_POWER_DRAIN:
             {
                 // Can be area effect, Check only for players and not check if target - caster (spell can have multiply drain/burn effects)
-                if(m_caster->GetTypeId() == TYPEID_PLAYER)
-                    if(Unit* target = m_targets.getUnitTarget())
-                        if(target != m_caster && target->getPowerType() != m_spellInfo->EffectMiscValue[i])
+                if (m_caster->GetTypeId() == TYPEID_PLAYER)
+                    if (Unit* target = m_targets.getUnitTarget())
+                        if (target != m_caster && int32(target->getPowerType()) != m_spellInfo->EffectMiscValue[i])
                             return SPELL_FAILED_BAD_TARGETS;
                 break;
             }
@@ -6064,17 +6065,17 @@ SpellCastResult Spell::CheckItems()
                 if (!(m_targets.getItemTarget()->GetProto()->Flags & ITEM_FLAG_PROSPECTABLE))
                     return SPELL_FAILED_CANT_BE_PROSPECTED;
                 // prevent prospecting in trade slot
-                if( m_targets.getItemTarget()->GetOwnerGUID() != m_caster->GetGUID() )
+                if (m_targets.getItemTarget()->GetOwnerGUID() != m_caster->GetGUID())
                     return SPELL_FAILED_CANT_BE_PROSPECTED;
                 // Check for enough skill in jewelcrafting
                 uint32 item_prospectingskilllevel = m_targets.getItemTarget()->GetProto()->RequiredSkillRank;
-                if(item_prospectingskilllevel >p_caster->GetSkillValue(SKILL_JEWELCRAFTING))
+                if (item_prospectingskilllevel >p_caster->GetSkillValue(SKILL_JEWELCRAFTING))
                     return SPELL_FAILED_LOW_CASTLEVEL;
                 // make sure the player has the required ores in inventory
-                if(m_targets.getItemTarget()->GetCount() < 5)
+                if (int32(m_targets.getItemTarget()->GetCount()) < CalculateDamage(SpellEffectIndex(i), m_caster))
                     return SPELL_FAILED_NEED_MORE_ITEMS;
 
-                if(!LootTemplates_Prospecting.HaveLootFor(m_targets.getItemTargetEntry()))
+                if (!LootTemplates_Prospecting.HaveLootFor(m_targets.getItemTargetEntry()))
                     return SPELL_FAILED_CANT_BE_PROSPECTED;
 
                 break;
@@ -6087,14 +6088,14 @@ SpellCastResult Spell::CheckItems()
                 if (!(m_targets.getItemTarget()->GetProto()->Flags & ITEM_FLAG_MILLABLE))
                     return SPELL_FAILED_CANT_BE_MILLED;
                 // prevent milling in trade slot
-                if( m_targets.getItemTarget()->GetOwnerGUID() != m_caster->GetGUID() )
+                if (m_targets.getItemTarget()->GetOwnerGUID() != m_caster->GetGUID())
                     return SPELL_FAILED_CANT_BE_MILLED;
                 // Check for enough skill in inscription
                 uint32 item_millingskilllevel = m_targets.getItemTarget()->GetProto()->RequiredSkillRank;
-                if(item_millingskilllevel >p_caster->GetSkillValue(SKILL_INSCRIPTION))
+                if (item_millingskilllevel >p_caster->GetSkillValue(SKILL_INSCRIPTION))
                     return SPELL_FAILED_LOW_CASTLEVEL;
                 // make sure the player has the required herbs in inventory
-                if(m_targets.getItemTarget()->GetCount() < 5)
+                if (int32(m_targets.getItemTarget()->GetCount()) < CalculateDamage(SpellEffectIndex(i), m_caster))
                     return SPELL_FAILED_NEED_MORE_ITEMS;
 
                 if(!LootTemplates_Milling.HaveLootFor(m_targets.getItemTargetEntry()))
@@ -6413,7 +6414,7 @@ bool Spell::CheckTarget( Unit* target, SpellEffectIndex eff )
 bool Spell::IsNeedSendToClient() const
 {
     return m_spellInfo->SpellVisual[0] || m_spellInfo->SpellVisual[1] || IsChanneledSpell(m_spellInfo) ||
-        m_spellInfo->speed > 0.0f || !m_triggeredByAuraSpell && !m_IsTriggeredSpell;
+        m_spellInfo->speed > 0.0f || (!m_triggeredByAuraSpell && !m_IsTriggeredSpell);
 }
 
 
