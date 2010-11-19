@@ -789,7 +789,18 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
 
         // Call KilledUnit for creatures
         if (GetTypeId() == TYPEID_UNIT && ((Creature*)this)->AI())
+        {
             ((Creature*)this)->AI()->KilledUnit(pVictim);
+        }
+        else if (GetTypeId() == TYPEID_PLAYER)
+        {
+            // currently not known if other pet types (not controllable) may have some action at owner kills
+            if (Pet* pProtector = GetProtectorPet())
+            {
+                if (pProtector->AI())
+                    pProtector->AI()->OwnerKilledUnit(pVictim);
+            }
+        }
 
         // achievement stuff
         if (pVictim->GetTypeId() == TYPEID_PLAYER)
@@ -5905,7 +5916,7 @@ void Unit::RemoveGuardians()
     {
         uint64 guid = *m_guardianPets.begin();
         if(Pet* pet = GetMap()->GetPet(guid))
-            pet->Remove(PET_SAVE_AS_DELETED);
+            pet->Unsummon(PET_SAVE_AS_DELETED, this);
 
         m_guardianPets.erase(guid);
     }
@@ -6085,9 +6096,9 @@ int32 Unit::SpellBonusWithCoeffs(SpellEntry const *spellProto, int32 total, int3
         coeff = damagetype == DOT ? bonus->dot_damage : bonus->direct_damage;
 
         // apply ap bonus at done part calculation only (it flat total mod so common with taken)
-        if (donePart && bonus->ap_bonus)
+        if (donePart && (bonus->ap_bonus || bonus->ap_dot_bonus))
         {
-            float ap_bonus = bonus->ap_bonus;
+            float ap_bonus = damagetype == DOT ? bonus->ap_dot_bonus : bonus->ap_bonus;
 
             // Impurity
             if (GetTypeId() == TYPEID_PLAYER && spellProto->SpellFamilyName == SPELLFAMILY_DEATHKNIGHT)
@@ -6096,7 +6107,7 @@ int32 Unit::SpellBonusWithCoeffs(SpellEntry const *spellProto, int32 total, int3
                     ap_bonus += ((spell->CalculateSimpleValue(EFFECT_INDEX_0) * ap_bonus) / 100.0f);
             }
 
-            total += int32(ap_bonus * (GetTotalAttackPowerValue(BASE_ATTACK) + ap_benefit));
+            total += int32(ap_bonus * (GetTotalAttackPowerValue(IsSpellRequiresRangedAP(spellProto) ? RANGED_ATTACK : BASE_ATTACK) + ap_benefit));
         }
     }
     // Default calculation

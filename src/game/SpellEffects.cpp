@@ -150,7 +150,7 @@ pEffect SpellEffects[TOTAL_SPELL_EFFECTS]=
     &Spell::EffectNULL,                                     // 87 SPELL_EFFECT_WMO_DAMAGE (57 spells in 3.3.2)
     &Spell::EffectNULL,                                     // 88 SPELL_EFFECT_WMO_REPAIR (2 spells in 3.3.2)
     &Spell::EffectNULL,                                     // 89 SPELL_EFFECT_WMO_CHANGE (7 spells in 3.3.2)
-    &Spell::EffectKillCreditPersonal,                       // 90 SPELL_EFFECT_KILL_CREDIT              Kill credit but only for single person
+    &Spell::EffectKillCreditPersonal,                       // 90 SPELL_EFFECT_KILL_CREDIT_PERSONAL     Kill credit but only for single person
     &Spell::EffectUnused,                                   // 91 SPELL_EFFECT_THREAT_ALL               one spell: zzOLDBrainwash
     &Spell::EffectEnchantHeldItem,                          // 92 SPELL_EFFECT_ENCHANT_HELD_ITEM
     &Spell::EffectBreakPlayerTargeting,                     // 93 SPELL_EFFECT_BREAK_PLAYER_TARGETING
@@ -194,7 +194,7 @@ pEffect SpellEffects[TOTAL_SPELL_EFFECTS]=
     &Spell::EffectUnused,                                   //131 SPELL_EFFECT_131                      used in some test spells
     &Spell::EffectPlayMusic,                                //132 SPELL_EFFECT_PLAY_MUSIC               sound id in misc value (SoundEntries.dbc)
     &Spell::EffectUnlearnSpecialization,                    //133 SPELL_EFFECT_UNLEARN_SPECIALIZATION   unlearn profession specialization
-    &Spell::EffectKillCredit,                               //134 SPELL_EFFECT_KILL_CREDIT              misc value is creature entry
+    &Spell::EffectKillCreditGroup,                          //134 SPELL_EFFECT_KILL_CREDIT_GROUP        misc value is creature entry
     &Spell::EffectNULL,                                     //135 SPELL_EFFECT_CALL_PET
     &Spell::EffectHealPct,                                  //136 SPELL_EFFECT_HEAL_PCT
     &Spell::EffectEnergisePct,                              //137 SPELL_EFFECT_ENERGIZE_PCT
@@ -654,36 +654,11 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
                     if (m_caster->HasAura(57627))           // Charge 6 sec post-affect
                         damage *= 2;
                 }
-                // Mongoose Bite
-                else if ((m_spellInfo->SpellFamilyFlags & UI64LIT(0x000000002)) && m_spellInfo->SpellVisual[0]==342)
-                {
-                    damage += int32(m_caster->GetTotalAttackPowerValue(BASE_ATTACK)*0.2f);
-                }
-                // Counterattack
-                else if (m_spellInfo->SpellFamilyFlags & UI64LIT(0x0008000000000000))
-                {
-                    damage += int32(m_caster->GetTotalAttackPowerValue(BASE_ATTACK)*0.2f);
-                }
-                // Arcane Shot
-                else if ((m_spellInfo->SpellFamilyFlags & UI64LIT(0x00000800)) && m_spellInfo->maxLevel > 0)
-                {
-                    damage += int32(m_caster->GetTotalAttackPowerValue(RANGED_ATTACK)*0.15f);
-                }
                 // Steady Shot
                 else if (m_spellInfo->SpellFamilyFlags & UI64LIT(0x100000000))
                 {
                     int32 base = irand((int32)m_caster->GetWeaponDamageRange(RANGED_ATTACK, MINDAMAGE),(int32)m_caster->GetWeaponDamageRange(RANGED_ATTACK, MAXDAMAGE));
                     damage += int32(float(base)/m_caster->GetAttackTime(RANGED_ATTACK)*2800 + m_caster->GetTotalAttackPowerValue(RANGED_ATTACK)*0.1f);
-                }
-                // Explosive Trap Effect
-                else if (m_spellInfo->SpellFamilyFlags & UI64LIT(0x00000004))
-                {
-                    damage += int32(m_caster->GetTotalAttackPowerValue(RANGED_ATTACK)*0.1f);
-                }
-                // Volley
-                else if (m_spellInfo->SpellFamilyFlags & UI64LIT(0x00002000))
-                {
-                    damage += int32(m_caster->GetTotalAttackPowerValue(RANGED_ATTACK)*0.0837f);
                 }
                 break;
             }
@@ -4686,6 +4661,25 @@ void Spell::DoSummonGuardian(SpellEffectIndex eff_idx, uint32 forceFaction)
     if (!propEntry)
         return;
 
+    PetType petType = propEntry->Title == UNITNAME_SUMMON_TITLE_COMPANION ? PROTECTOR_PET : GUARDIAN_PET;
+
+    // protectors allowed only in single amount
+    if (petType == PROTECTOR_PET)
+    {
+        Pet* old_protector = m_caster->GetProtectorPet();
+
+        // for same pet just despawn
+        if (old_protector && old_protector->GetEntry() == pet_entry)
+        {
+            old_protector->Unsummon(PET_SAVE_AS_DELETED, m_caster);
+            return;
+        }
+
+        // despawn old pet before summon new
+        if (old_protector)
+            old_protector->Unsummon(PET_SAVE_AS_DELETED, m_caster);
+    }
+
     // in another case summon new
     uint32 level = m_caster->getLevel();
 
@@ -4717,7 +4711,7 @@ void Spell::DoSummonGuardian(SpellEffectIndex eff_idx, uint32 forceFaction)
 
     for(int32 count = 0; count < amount; ++count)
     {
-        Pet* spawnCreature = new Pet(propEntry->Title == UNITNAME_SUMMON_TITLE_COMPANION ? PROTECTOR_PET : GUARDIAN_PET);
+        Pet* spawnCreature = new Pet(petType);
 
         Map *map = m_caster->GetMap();
         uint32 pet_number = sObjectMgr.GeneratePetNumber();
@@ -5135,7 +5129,7 @@ void Spell::EffectSummonPet(SpellEffectIndex eff_idx)
         }
 
         if(m_caster->GetTypeId() == TYPEID_PLAYER)
-            ((Player*)m_caster)->RemovePet(OldSummon,(OldSummon->getPetType()==HUNTER_PET ? PET_SAVE_AS_DELETED : PET_SAVE_NOT_IN_SLOT),false);
+            OldSummon->Unsummon(OldSummon->getPetType() == HUNTER_PET ? PET_SAVE_AS_DELETED : PET_SAVE_NOT_IN_SLOT, m_caster);
         else
             return;
     }
@@ -5147,7 +5141,7 @@ void Spell::EffectSummonPet(SpellEffectIndex eff_idx)
         return;
 
     // not error in case fail hunter call pet
-    if(!petentry)
+    if (!petentry)
     {
         delete NewSummon;
         return;
@@ -6293,7 +6287,7 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     {
                         // Is this all to be done at completion?
                         if (Pet* pPet = m_caster->FindGuardianWithEntry(pSpell->EffectMiscValue[EFFECT_INDEX_0]))
-                            ((Player*)m_caster)->RemovePet(pPet, PET_SAVE_NOT_IN_SLOT);
+                            pPet->Unsummon(PET_SAVE_NOT_IN_SLOT, m_caster);
                     }
                     return;
                 }
@@ -7353,7 +7347,7 @@ void Spell::EffectDismissPet(SpellEffectIndex /*eff_idx*/)
     if(!pet||!pet->isAlive())
         return;
 
-    ((Player*)m_caster)->RemovePet(pet, PET_SAVE_NOT_IN_SLOT);
+    pet->Unsummon(PET_SAVE_NOT_IN_SLOT, m_caster);
 }
 
 void Spell::EffectSummonObject(SpellEffectIndex eff_idx)
@@ -7740,7 +7734,7 @@ void Spell::DoSummonCritter(SpellEffectIndex eff_idx, uint32 forceFaction)
     if(duration > 0)
         critter->SetDuration(duration);
 
-    player->SetMiniPet(critter);
+    player->_SetMiniPet(critter);
 
     map->Add((Creature*)critter);
 }
@@ -8190,7 +8184,7 @@ void Spell::EffectKillCreditPersonal(SpellEffectIndex eff_idx)
     ((Player*)unitTarget)->KilledMonsterCredit(m_spellInfo->EffectMiscValue[eff_idx]);
 }
 
-void Spell::EffectKillCredit(SpellEffectIndex eff_idx)
+void Spell::EffectKillCreditGroup(SpellEffectIndex eff_idx)
 {
     if(!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
         return;
