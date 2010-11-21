@@ -9,7 +9,7 @@
 - Level 100 maximum
 - Demonic Circle (modified by bloutix)
 - Poigne de la Mort (modified by bloutix)
-- Image Miroir (debug from Kapatejib)
+- Image Miroir (modified by Bloutix)
 
 - Chat logs and lexics cutter
 - fix prevent proc spell 49222 from heals

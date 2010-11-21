@@ -9408,11 +9408,11 @@ void Aura::HandleAuraInitializeImages(bool Apply, bool Real)
         return;
     //Unit* creator = Unit::GetUnit(*target,target->GetCreatorGUID());
     //hackfix Unit* creator = GetCaster();
-    Unit *creator = ObjectAccessor::GetUnit(*target, target->GetCreatorGUID());
+    Unit *creator = ObjectAccessor::GetUnit(*target, target->GetCreatorGuid());
     if (!creator)
         creator = caster;
     Creature* pImmage = (Creature*)target;
-    if (creator != caster || pImmage->isPet())
+    if (creator != caster || pImmage->IsPet())
         return;
 
     // set stats and visual
