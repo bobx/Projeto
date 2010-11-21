@@ -940,6 +940,8 @@ void BattleGroundQueue::Update(BattleGroundTypeId bgTypeId, BattleGroundBracketI
 
         //optimalization : --- we dont need to use selection_pools - each update we select max 2 groups
 
+        uint32 teamId = 0;
+
         for(uint32 i = BG_QUEUE_PREMADE_ALLIANCE; i < BG_QUEUE_NORMAL_ALLIANCE; i++)
         {
             // take the group that joined first
@@ -971,8 +973,11 @@ void BattleGroundQueue::Update(BattleGroundTypeId bgTypeId, BattleGroundBracketI
                     && (((*itr_team[BG_TEAM_ALLIANCE])->ArenaTeamRating >= arenaMinRating && (*itr_team[BG_TEAM_ALLIANCE])->ArenaTeamRating <= arenaMaxRating)
                         || (*itr_team[BG_TEAM_ALLIANCE])->JoinTime < discardTime) )
                 {
-                    m_SelectionPools[BG_TEAM_ALLIANCE].AddGroup((*itr_team[BG_TEAM_ALLIANCE]), MaxPlayersPerTeam);
-                    break;
+                    if((*itr_team[BG_TEAM_ALLIANCE])->ArenaTeamId != teamId)
+                    {
+                        m_SelectionPools[BG_TEAM_ALLIANCE].AddGroup((*itr_team[BG_TEAM_ALLIANCE]), MaxPlayersPerTeam);
+                        break;
+                    }
                 }
             }
         }
@@ -987,8 +992,11 @@ void BattleGroundQueue::Update(BattleGroundTypeId bgTypeId, BattleGroundBracketI
                     && (((*itr_team[BG_TEAM_HORDE])->ArenaTeamRating >= arenaMinRating && (*itr_team[BG_TEAM_HORDE])->ArenaTeamRating <= arenaMaxRating)
                         || (*itr_team[BG_TEAM_HORDE])->JoinTime < discardTime) )
                 {
-                    m_SelectionPools[BG_TEAM_HORDE].AddGroup((*itr_team[BG_TEAM_HORDE]), MaxPlayersPerTeam);
-                    break;
+                    if((*itr_team[BG_TEAM_HORDE])->ArenaTeamId != teamId)
+                    {
+                        m_SelectionPools[BG_TEAM_HORDE].AddGroup((*itr_team[BG_TEAM_HORDE]), MaxPlayersPerTeam);
+                        break;
+                    }
                 }
             }
         }
@@ -1361,7 +1369,7 @@ void BattleGroundMgr::BuildPvpLogDataPacket(WorldPacket *data, BattleGround *bg)
                 *data << (int32)0;                          // 0
                 break;
             default:
-                DEBUG_LOG("Unhandled MSG_PVP_LOG_DATA for BG id %u", bg->GetTypeID(true));
+                sLog.outDebug("Unhandled MSG_PVP_LOG_DATA for BG id %u", bg->GetTypeID(true));
                 *data << (int32)0;
                 break;
         }
@@ -1496,7 +1504,7 @@ BattleGround * BattleGroundMgr::CreateNewBattleGround(BattleGroundTypeId bgTypeI
     if(bgTypeId==BATTLEGROUND_RB)
     {
         BattleGroundTypeId random_bgs[] = {BATTLEGROUND_AV, BATTLEGROUND_WS, BATTLEGROUND_AB, BATTLEGROUND_EY/*, BATTLEGROUND_SA, BATTLEGROUND_IC*/};
-        uint32 bg_num = urand(0,3/*5*/);
+        uint32 bg_num = urand(0, sizeof(random_bgs)/sizeof(BattleGroundTypeId)-1);
         bgTypeId = random_bgs[bg_num];
         bg_template = GetBattleGroundTemplate(bgTypeId);
         if (!bg_template)
@@ -1828,7 +1836,6 @@ void BattleGroundMgr::BuildBattleGroundListPacket(WorldPacket *data, ObjectGuid 
     *data << uint32( loos_kills );                          // 3.3.3 lossHonor
 
     uint8 isRandom = bgTypeId == BATTLEGROUND_RB;
-
     *data << uint8(isRandom);                               // 3.3.3 isRandom
 
     if(isRandom)

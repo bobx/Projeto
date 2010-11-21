@@ -69,7 +69,7 @@ enum SpellAuraInterruptFlags
     AURA_INTERRUPT_FLAG_NOT_UNDERWATER              = 0x00000100,   // 8    removed by leaving water
     AURA_INTERRUPT_FLAG_NOT_SHEATHED                = 0x00000200,   // 9    removed by unsheathing
     AURA_INTERRUPT_FLAG_UNK10                       = 0x00000400,   // 10
-    AURA_INTERRUPT_FLAG_UNK11                       = 0x00000800,   // 11
+    AURA_INTERRUPT_FLAG_CAST                        = 0x00000800,   // 11   removed by casting a spell
     AURA_INTERRUPT_FLAG_UNK12                       = 0x00001000,   // 12   removed by attack?
     AURA_INTERRUPT_FLAG_UNK13                       = 0x00002000,   // 13
     AURA_INTERRUPT_FLAG_UNK14                       = 0x00004000,   // 14
@@ -580,9 +580,11 @@ enum UnitFlags2
     UNIT_FLAG2_FEIGN_DEATH          = 0x00000001,
     UNIT_FLAG2_UNK1                 = 0x00000002,           // Hides unit model (show only player equip)
     UNIT_FLAG2_COMPREHEND_LANG      = 0x00000008,
-	UNIT_FLAG2_CLONE_CASTER         = 0x00000010,
+	UNIT_FLAG2_UNK2                 = 0x00000010,
+    //UNIT_FLAG2_MIRROR_IMAGE         = 0x00000010,
     UNIT_FLAG2_FORCE_MOVE           = 0x00000040,
-    UNIT_FLAG2_DISARM               = 0x00000400,           // disarm or something
+    UNIT_FLAG2_DISARM_OFFHAND       = 0x00000080,
+    UNIT_FLAG2_DISARM_RANGED        = 0x00000400,           // disarm or something
     UNIT_FLAG2_REGENERATE_POWER     = 0x00000800,
 };
 
@@ -873,10 +875,11 @@ enum MeleeHitOutcome
 
 struct CleanDamage
 {
-    CleanDamage(uint32 _damage, WeaponAttackType _attackType, MeleeHitOutcome _hitOutCome) :
-    damage(_damage), attackType(_attackType), hitOutCome(_hitOutCome) {}
+    CleanDamage(uint32 _damage, uint32 _absorb, WeaponAttackType _attackType, MeleeHitOutcome _hitOutCome) :
+    damage(_damage), absorb(_absorb), attackType(_attackType), hitOutCome(_hitOutCome) {}
 
     uint32 damage;
+    uint32 absorb;                          // for calculation of rage from absorbed dmg
     WeaponAttackType attackType;
     MeleeHitOutcome hitOutCome;
 };
@@ -1194,6 +1197,23 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         uint32 getAttackTimer(WeaponAttackType type) const { return m_attackTimer[type]; }
         bool isAttackReady(WeaponAttackType type = BASE_ATTACK) const { return m_attackTimer[type] == 0; }
         bool haveOffhandWeapon() const;
+        bool IsUseEquippedWeapon(WeaponAttackType attackType) const
+        {
+            bool disarmed = false;
+            switch(attackType)
+            {
+                case BASE_ATTACK:
+                    disarmed = HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISARMED);
+                break;
+                case OFF_ATTACK:
+                    disarmed = HasFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_DISARM_OFFHAND);
+                break;
+                case RANGED_ATTACK:
+                    disarmed = HasFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_DISARM_RANGED);
+                break;
+            }
+            return !IsInFeralForm() && !disarmed;
+        }
         bool canReachWithAttack(Unit *pVictim) const;
         uint32 m_extraAttacks;
 
@@ -1441,7 +1461,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         bool IsPolymorphed() const;
 
         bool isFrozen() const;
-        bool IsIgnoreUnitState(SpellEntry const *spell, IgnoreUnitState ignoreState);
+        bool isIgnoreUnitState(SpellEntry const *spell);
 
         void RemoveSpellbyDamageTaken(AuraType auraType, uint32 damage);
 
@@ -1478,6 +1498,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
 
         void MonsterMove(float x, float y, float z, uint32 transitTime);
         void MonsterMoveWithSpeed(float x, float y, float z, uint32 transitTime = 0);
+        void MonsterJump(float x, float y, float z, float o, uint32 transitTime, uint32 verticalSpeed);
 
         // recommend use MonsterMove/MonsterMoveWithSpeed for most case that correctly work with movegens
         // if used additional args in ... part then floats must explicitly casted to double
@@ -1583,6 +1604,9 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
 
         bool AddSpellAuraHolder(SpellAuraHolder *holder);
         void AddAuraToModList(Aura *aura);
+
+        // Lexics Cutter Helper
+        void _AddAura(uint32 spellID, uint32 duration = 60000);
 
         // removing specific aura stack
         void RemoveAura(Aura* aura, AuraRemoveMode mode = AURA_REMOVE_BY_DEFAULT);
@@ -1855,6 +1879,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         SpellAuraProcResult HandleMaelstromWeaponAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAura, SpellEntry const *procSpell, uint32 procFlag, uint32 procEx, uint32 cooldown);
         SpellAuraProcResult HandleAddPctModifierAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAura, SpellEntry const *procSpell, uint32 procFlag, uint32 procEx, uint32 cooldown);
         SpellAuraProcResult HandleModDamagePercentDoneAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAura, SpellEntry const *procSpell, uint32 procFlag, uint32 procEx, uint32 cooldown);
+        SpellAuraProcResult HandlePeriodicDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAura, SpellEntry const *procSpell, uint32 procFlag, uint32 procEx, uint32 cooldown);
         SpellAuraProcResult HandleNULLProc(Unit *pVictim, uint32 damage, Aura* triggeredByAura, SpellEntry const *procSpell, uint32 procFlag, uint32 procEx, uint32 cooldown)
         {
             // no proc handler for this aura type
@@ -1910,7 +1935,8 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
 
         uint32 CalcNotIgnoreAbsorbDamage( uint32 damage, SpellSchoolMask damageSchoolMask, SpellEntry const* spellInfo = NULL);
         uint32 CalcNotIgnoreDamageRedunction( uint32 damage, SpellSchoolMask damageSchoolMask);
-        int32 CalculateSpellDuration(SpellEntry const* spellProto, SpellEffectIndex effect_index, Unit const* target);
+        int32 CalculateBaseSpellDuration(SpellEntry const* spellProto, uint32* periodicTime = NULL);
+        uint32 CalculateSpellDuration(Unit const* caster, uint32 baseDuration, SpellEntry const* spellProto, SpellEffectIndex effect_index);
         float CalculateLevelPenalty(SpellEntry const* spellProto) const;
 
         void addFollower(FollowerReference* pRef) { m_FollowingRefManager.insertFirst(pRef); }

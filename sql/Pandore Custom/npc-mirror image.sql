@@ -1,1 +1,0 @@
-UPDATE `creature_template` SET `ScriptName` = 'npc_mirror_image' WHERE `entry` = 37130;

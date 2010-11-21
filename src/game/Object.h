@@ -64,6 +64,7 @@ class WorldPacket;
 class UpdateData;
 class WorldSession;
 class Creature;
+class GameObject;
 class Player;
 class Unit;
 class Map;
@@ -380,7 +381,7 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         virtual float GetObjectBoundingRadius() const { return DEFAULT_WORLD_OBJECT_SIZE; }
 
         bool IsPositionValid() const;
-        void UpdateGroundPositionZ(float x, float y, float &z) const;
+        void UpdateGroundPositionZ(float x, float y, float &z, float maxDiff = 30.0f) const;
         void UpdateAllowedPositionZ(float x, float y, float &z) const;
 
         void GetRandomPoint( float x, float y, float z, float distance, float &rand_x, float &rand_y, float &rand_z ) const;
@@ -493,6 +494,8 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         void BuildUpdateData(UpdateDataMapType &);
 
         Creature* SummonCreature(uint32 id, float x, float y, float z, float ang,TempSummonType spwtype,uint32 despwtime, bool asActiveObject = false);
+
+        GameObject* SummonGameobject(uint32 id, float x, float y, float z, float angle, uint32 despwtime);
 
         bool isActiveObject() const { return m_isActiveObject || m_viewPoint.hasViewers(); }
 

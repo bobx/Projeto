@@ -915,9 +915,9 @@ enum PlayerLoginQueryIndex
     PLAYER_LOGIN_QUERY_LOADMAILS,
     PLAYER_LOGIN_QUERY_LOADMAILEDITEMS,
     PLAYER_LOGIN_QUERY_LOADTALENTS,
+    PLAYER_LOGIN_QUERY_LOADRANDOMBG,
     PLAYER_LOGIN_QUERY_LOADWEEKLYQUESTSTATUS,
     PLAYER_LOGIN_QUERY_LOADMONTHLYQUESTSTATUS,
-	PLAYER_LOGIN_QUERY_LOADRANDOMBG,
 
     MAX_PLAYER_LOGIN_QUERY
 };
@@ -1337,11 +1337,6 @@ class MANGOS_DLL_SPEC Player : public Unit
         void AddArmorProficiency(uint32 newflag) { m_ArmorProficiency |= newflag; }
         uint32 GetWeaponProficiency() const { return m_WeaponProficiency; }
         uint32 GetArmorProficiency() const { return m_ArmorProficiency; }
-        bool IsUseEquippedWeapon( bool mainhand ) const
-        {
-            // disarm applied only to mainhand weapon
-            return !IsInFeralForm() && (!mainhand || !HasFlag(UNIT_FIELD_FLAGS,UNIT_FLAG_DISARMED) );
-        }
         bool IsTwoHandUsed() const
         {
             Item* mainItem = GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND);
@@ -2201,6 +2196,10 @@ class MANGOS_DLL_SPEC Player : public Unit
         bool GetRandomWinner() { return m_IsBGRandomWinner; }
         void SetRandomWinner(bool isWinner);
 
+        // last used pet number (for BG's)
+        uint32 GetLastPetNumber() const { return m_lastpetnumber; }
+        void SetLastPetNumber(uint32 petnumber) { m_lastpetnumber = petnumber; }
+
         /*********************************************************/
         /***                    REST SYSTEM                    ***/
         /*********************************************************/
@@ -2241,7 +2240,11 @@ class MANGOS_DLL_SPEC Player : public Unit
         bool isMoving() const { return m_movementInfo.HasMovementFlag(movementFlagsMask); }
         bool isMovingOrTurning() const { return m_movementInfo.HasMovementFlag(movementOrTurningFlagsMask); }
 
-        bool CanFly() const { return m_movementInfo.HasMovementFlag(MOVEFLAG_CAN_FLY); }
+        uint32 Anti__GetLastTeleTime() const { return m_anti_TeleTime; }
+        void Anti__SetLastTeleTime(uint32 TeleTime) { m_anti_TeleTime=TeleTime; }
+        //bool CanFly() const { return m_movementInfo.HasMovementFlag(MOVEFLAG_CAN_FLY); }
+        bool CanFly() const { return m_CanFly;  }
+        void SetCanFly(bool CanFly) { m_CanFly=CanFly; }
         bool IsFlying() const { return m_movementInfo.HasMovementFlag(MOVEFLAG_FLYING); }
         bool IsFreeFlying() const { return HasAuraType(SPELL_AURA_MOD_FLIGHT_SPEED_MOUNTED) || HasAuraType(SPELL_AURA_FLY); }
         bool CanStartFlyInArea(uint32 mapid, uint32 zone, uint32 area) const;
@@ -2392,6 +2395,8 @@ class MANGOS_DLL_SPEC Player : public Unit
         AchievementMgr const& GetAchievementMgr() const { return m_achievementMgr; }
         AchievementMgr& GetAchievementMgr() { return m_achievementMgr; }
         void UpdateAchievementCriteria(AchievementCriteriaTypes type, uint32 miscvalue1=0, uint32 miscvalue2=0, Unit *unit=NULL, uint32 time=0);
+        void CompletedAchievement(AchievementEntry const* entry);
+        void CompletedAchievement(uint32 uiAchievementID);
         void StartTimedAchievementCriteria(AchievementCriteriaTypes type, uint32 timedRequirementId, time_t startTime = 0);
 
 
@@ -2419,7 +2424,6 @@ class MANGOS_DLL_SPEC Player : public Unit
 
         BgBattleGroundQueueID_Rec m_bgBattleGroundQueueID[PLAYER_MAX_BATTLEGROUND_QUEUES];
         BGData                    m_bgData;
-
         bool m_IsBGRandomWinner;
 
         /*********************************************************/
@@ -2448,9 +2452,9 @@ class MANGOS_DLL_SPEC Player : public Unit
         void _LoadMailedItems(QueryResult *result);
         void _LoadQuestStatus(QueryResult *result);
         void _LoadDailyQuestStatus(QueryResult *result);
+        void _LoadRandomBGStatus(QueryResult *result);
         void _LoadWeeklyQuestStatus(QueryResult *result);
         void _LoadMonthlyQuestStatus(QueryResult *result);
-		void _LoadRandomBGStatus(QueryResult *result);
         void _LoadGroup(QueryResult *result);
         void _LoadSkills(QueryResult *result);
         void _LoadSpells(QueryResult *result);
@@ -2606,6 +2610,16 @@ class MANGOS_DLL_SPEC Player : public Unit
         RestType rest_type;
         ////////////////////Rest System/////////////////////
 
+        //movement anticheat
+        uint32 m_anti_lastmovetime;     //last movement time
+        float  m_anti_MovedLen;         //Length of traveled way
+        uint32 m_anti_NextLenCheck;
+        float  m_anti_BeginFallZ;    //alternative falling begin
+        uint32 m_anti_lastalarmtime;    //last time when alarm generated
+        uint32 m_anti_alarmcount;       //alarm counter
+        uint32 m_anti_TeleTime;
+        bool m_CanFly;
+
         // Transports
         Transport * m_transport;
 
@@ -2623,6 +2637,9 @@ class MANGOS_DLL_SPEC Player : public Unit
         Group *m_groupInvite;
         uint32 m_groupUpdateMask;
         uint64 m_auraUpdateMask;
+
+        // last used pet number (for BG's)
+        uint32 m_lastpetnumber;
 
         // Player summoning
         time_t m_summon_expire;

@@ -7006,8 +7006,8 @@ void ObjectMgr::LoadReputationOnKill()
 
     //                                                0            1                     2
     QueryResult *result = WorldDatabase.Query("SELECT creature_id, RewOnKillRepFaction1, RewOnKillRepFaction2,"
-    //   3             4             5                   6             7             8                   9
-        "IsTeamAward1, MaxStanding1, RewOnKillRepValue1, IsTeamAward2, MaxStanding2, RewOnKillRepValue2, TeamDependent "
+    //   3             4             5                   6             7             8                   9              10
+        "IsTeamAward1, MaxStanding1, RewOnKillRepValue1, IsTeamAward2, MaxStanding2, RewOnKillRepValue2, TeamDependent, ChampioningAura "
         "FROM creature_onkill_reputation");
 
     if(!result)
@@ -7040,6 +7040,7 @@ void ObjectMgr::LoadReputationOnKill()
         repOnKill.reputation_max_cap2  = fields[7].GetUInt32();
         repOnKill.repvalue2            = fields[8].GetInt32();
         repOnKill.team_dependent       = fields[9].GetUInt8();
+        repOnKill.championingAura      = fields[10].GetUInt32();
 
         if(!GetCreatureTemplate(creature_id))
         {
@@ -8108,6 +8109,46 @@ const char *ObjectMgr::GetMangosString(int32 entry, int locale_idx) const
     return "<error>";
 }
 
+void ObjectMgr::LoadSpellDisabledEntrys()
+{
+    m_spell_disabled.clear();                                // need for reload case
+    QueryResult *result = WorldDatabase.Query("SELECT entry, ischeat_spell FROM spell_disabled where active=1");
+
+    uint32 total_count = 0;
+    uint32 cheat_spell_count=0;
+
+    if( !result )
+    {
+        barGoLink bar( 1 );
+        bar.step();
+
+        sLog.outString();
+        sLog.outString( ">> Loaded %u disabled spells", total_count );
+        return;
+    }
+
+    barGoLink bar( result->GetRowCount() );
+
+    Field* fields;
+    do
+    {
+        bar.step();
+        fields = result->Fetch();
+        uint32 spellid = fields[0].GetUInt32();
+        bool ischeater = fields[1].GetBool();
+        m_spell_disabled[spellid] = ischeater;
+        ++total_count;
+        if(ischeater)
+        ++cheat_spell_count;
+
+    } while ( result->NextRow() );
+
+    delete result;
+
+    sLog.outString();
+    sLog.outString( ">> Loaded %u disabled spells ( %u - is cheaters spells)", total_count, cheat_spell_count);
+}
+
 void ObjectMgr::LoadFishingBaseSkillLevel()
 {
     mFishingBaseForArea.clear();                            // for reload case
@@ -8176,8 +8217,14 @@ uint16 ObjectMgr::GetConditionId( ConditionType condition, uint32 value1, uint32
     return mConditions.size() - 1;
 }
 
-bool ObjectMgr::CheckDeclinedNames( std::wstring mainpart, DeclinedName const& names )
+bool ObjectMgr::CheckDeclinedNames( std::wstring w_ownname, DeclinedName const& names )
 {
+    // get main part of the name
+    std::wstring mainpart = GetMainPartOfName(w_ownname, 0);
+    // prepare flags
+    bool x = true;
+    bool y = true;
+    // check declined names
     for(int i =0; i < MAX_DECLINED_NAME_CASES; ++i)
     {
         std::wstring wname;
@@ -8185,9 +8232,12 @@ bool ObjectMgr::CheckDeclinedNames( std::wstring mainpart, DeclinedName const& n
             return false;
 
         if(mainpart!=GetMainPartOfName(wname,i+1))
-            return false;
+            x = false;
+
+        if(w_ownname!=wname)
+            y = false;
     }
-    return true;
+    return (x||y);
 }
 
 uint32 ObjectMgr::GetAreaTriggerScriptId(uint32 trigger_id)

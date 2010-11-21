@@ -202,7 +202,7 @@ typedef void(Aura::*pAuraHandler)(bool Apply, bool Real);
 class MANGOS_DLL_SPEC Aura
 {
     friend struct ReapplyAffectedPassiveAurasHelper;
-    friend Aura* CreateAura(SpellEntry const* spellproto, SpellEffectIndex eff, int32 *currentBasePoints, SpellAuraHolder *holder, Unit *target, Unit *caster, Item* castItem);
+    friend MANGOS_DLL_SPEC Aura* CreateAura(SpellEntry const* spellproto, SpellEffectIndex eff, int32 *currentBasePoints, SpellAuraHolder *holder, Unit *target, Unit *caster, Item* castItem);
 
     public:
         //aura handlers
@@ -364,8 +364,8 @@ class MANGOS_DLL_SPEC Aura
         void HandlePhase(bool Apply, bool Real);
         void HandleModTargetArmorPct(bool Apply, bool Real);
         void HandleAuraModAllCritChance(bool Apply, bool Real);
-		void HandleAuraOpenStable(bool apply, bool Real);
-        void HandleAuraCloneCaster(bool Apply, bool Real);
+        void HandleAuraLinked(bool Apply, bool Real);
+        void HandleAuraOpenStable(bool apply, bool Real);
 
         virtual ~Aura();
 
@@ -518,6 +518,6 @@ class MANGOS_DLL_SPEC SingleEnemyTargetAura : public Aura
         ObjectGuid m_castersTargetGuid;
 };
 
-Aura* CreateAura(SpellEntry const* spellproto, SpellEffectIndex eff, int32 *currentBasePoints, SpellAuraHolder *holder, Unit *target, Unit *caster = NULL, Item* castItem = NULL);
-SpellAuraHolder* CreateSpellAuraHolder(SpellEntry const* spellproto, Unit *target, WorldObject *caster, Item *castItem = NULL);
+MANGOS_DLL_SPEC Aura* CreateAura(SpellEntry const* spellproto, SpellEffectIndex eff, int32 *currentBasePoints, SpellAuraHolder *holder, Unit *target, Unit *caster = NULL, Item* castItem = NULL);
+MANGOS_DLL_SPEC SpellAuraHolder* CreateSpellAuraHolder(SpellEntry const* spellproto, Unit *target, WorldObject *caster, Item *castItem = NULL);
 #endif

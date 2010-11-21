@@ -819,7 +819,7 @@ void BattleGround::EndBattleGround(uint32 winner)
                     plr->SetRandomWinner(true);
             }
 
-            plr->GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_WIN_BG, 1);            
+            plr->GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_WIN_BG, 1);
         }
         else
         {
@@ -1063,10 +1063,6 @@ void BattleGround::RemovePlayerAtLeave(uint64 guid, bool Transport, bool SendPac
                 plr->RemoveArenaAuras(true);                // removes debuffs / dots etc., we don't want the player to die after porting out
                 bgTypeId=BATTLEGROUND_AA;                   // set the bg type to all arenas (it will be used for queue refreshing)
 
-                // unsummon current and summon old pet if there was one and there isn't a current pet
-                plr->RemovePet(PET_SAVE_NOT_IN_SLOT);
-                plr->ResummonPetTemporaryUnSummonedIfAny();
-
                 if (isRated() && GetStatus() == STATUS_IN_PROGRESS)
                 {
                     //left a rated match while the encounter was in progress, consider as loser
@@ -1232,7 +1228,7 @@ void BattleGround::AddPlayer(Player *plr)
         }
 
         plr->DestroyConjuredItems(true);
-        plr->UnsummonPetTemporaryIfAny();
+        plr->RemovePet(PET_SAVE_REAGENTS);
 
         if(GetStatus() == STATUS_WAIT_JOIN)                 // not started yet
         {

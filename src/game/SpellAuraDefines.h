@@ -314,12 +314,12 @@ enum AuraType
     SPELL_AURA_276 = 276,                                   // Only "Test Mod Damage % Mechanic" spell, possible mod damage done
     SPELL_AURA_MOD_MAX_AFFECTED_TARGETS = 277,
     SPELL_AURA_MOD_DISARM_RANGED = 278,
-    SPELL_AURA_279 = 279,
+    SPELL_AURA_INITIALIZE_IMAGES = 279,
     SPELL_AURA_MOD_TARGET_ARMOR_PCT = 280,
     SPELL_AURA_MOD_HONOR_GAIN = 281,
     SPELL_AURA_MOD_BASE_HEALTH_PCT = 282,
     SPELL_AURA_MOD_HEALING_RECEIVED = 283,                  // Possibly only for some spell family class spells
-    SPELL_AURA_284,
+    SPELL_AURA_LINKED = 284,
     SPELL_AURA_MOD_ATTACK_POWER_OF_ARMOR = 285,
     SPELL_AURA_ABILITY_PERIODIC_CRIT = 286,
     SPELL_AURA_DEFLECT_SPELLS = 287,
@@ -351,7 +351,7 @@ enum AuraType
     SPELL_AURA_313 = 313,
     SPELL_AURA_314 = 314,
     SPELL_AURA_315 = 315,
-    SPELL_AURA_316 = 316,
+    SPELL_AURA_MOD_PERIODIC_HASTE = 316,
     TOTAL_AURAS = 317
 };
 

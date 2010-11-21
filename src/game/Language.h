@@ -902,6 +902,7 @@ enum MangosStrings
     //                                    10000-10999
 
     // Use for custom patches             11000-11999
+	
 	//For GM Announce and GM Stat
 	LANG_ANNOUNCE_MOD                 	= 11000,
 	LANG_ANNOUNCE_MJ                 	= 11001,
@@ -928,6 +929,9 @@ enum MangosStrings
     LANG_COMMAND_NO_FROZEN_PLAYERS      = 11020,
     LANG_COMMAND_LIST_FREEZE            = 11021,
     LANG_COMMAND_FROZEN_PLAYERS         = 11022,
+	
+	//Cheat ffrom Kapatejib
+    LANG_ANNOUNCE_CHEAT                 = 12000,
 
     // NOT RESERVED IDS                   12000-1999999999
     // `db_script_string` table index     2000000000-2000009999 (MIN_DB_SCRIPT_STRING_ID-MAX_DB_SCRIPT_STRING_ID)

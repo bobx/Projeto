@@ -520,6 +520,7 @@ Player::Player (WorldSession *session): Unit(), m_mover(this), m_camera(this), m
     m_ammoDPS = 0.0f;
 
     m_temporaryUnsummonedPetNumber = 0;
+    m_lastpetnumber = 0;
 
     ////////////////////Rest System/////////////////////
     time_inn_enter=0;
@@ -527,6 +528,17 @@ Player::Player (WorldSession *session): Unit(), m_mover(this), m_camera(this), m
     m_rest_bonus=0;
     rest_type=REST_TYPE_NO;
     ////////////////////Rest System/////////////////////
+
+    //movement anticheat
+    m_anti_lastmovetime = 0;   //last movement time
+    m_anti_NextLenCheck = 0;
+    m_anti_MovedLen = 0.0f;
+    m_anti_BeginFallZ = INVALID_HEIGHT;
+    m_anti_lastalarmtime = 0;    //last time when alarm generated
+    m_anti_alarmcount = 0;       //alarm counter
+    m_anti_TeleTime = 0;
+    m_CanFly=false;
+    /////////////////////////////////
 
     m_mailsUpdated = false;
     unReadMails = 0;
@@ -1395,6 +1407,9 @@ void Player::Update( uint32 p_time )
         if (!m_regenTimer)
             RegenerateAll();
     }
+
+    if (!isAlive() && !HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST))
+        SetHealth(0);
 
     if (m_deathState == JUST_DIED)
         KillPlayer();
@@ -4411,7 +4426,8 @@ void Player::BuildPlayerRepop()
     if(GetCorpse())
     {
         sLog.outError("BuildPlayerRepop: player %s(%d) already has a corpse", GetName(), GetGUIDLow());
-        MANGOS_ASSERT(false);
+        sLog.outError("Removing player %s(%d) corpse from DB", GetName(), GetGUIDLow());
+        CharacterDatabase.PExecute("DELETE FROM corpse WHERE player = '%d'",GetGUIDLow());
     }
 
     // create a corpse and place it at the player's location
@@ -4846,7 +4862,7 @@ void Player::RepopAtGraveyard()
     AreaTableEntry const *zone = GetAreaEntryByAreaID(GetAreaId());
 
     // Such zones are considered unreachable as a ghost and the player must be automatically revived
-    if ((!isAlive() && zone && zone->flags & AREA_FLAG_NEED_FLY) || GetTransport())
+    if ((!isAlive() && zone && zone->flags & AREA_FLAG_NEED_FLY) || GetTransport() || GetPositionZ() < -500.0f)
     {
         ResurrectPlayer(0.5f);
         SpawnCorpseBones();
@@ -6323,11 +6339,28 @@ void Player::RewardReputation(Unit *pVictim, float rate)
     if(!Rep)
         return;
 
+    uint32 Repfaction1 = Rep->repfaction1;
+    uint32 Repfaction2 = Rep->repfaction2;
+    uint32 tabardFactionID = 0;
+    
+    // Championning tabard reputation system
+    if(HasAura(Rep->championingAura))
+    {
+        if( Item* pItem = GetItemByPos( INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_TABARD ) )
+        {                 
+            if ( tabardFactionID = pItem->GetProto()->RequiredReputationFaction ) 
+            {
+                Repfaction1 = tabardFactionID;
+                Repfaction2 = tabardFactionID;
+            }
+        }
+    }
+
     if(Rep->repfaction1 && (!Rep->team_dependent || GetTeam()==ALLIANCE))
     {
-        int32 donerep1 = CalculateReputationGain(REPUTATION_SOURCE_KILL, Rep->repvalue1, Rep->repfaction1, pVictim->getLevel());
+        int32 donerep1 = CalculateReputationGain(REPUTATION_SOURCE_KILL, Rep->repvalue1, Repfaction1, pVictim->getLevel());
         donerep1 = int32(donerep1*rate);
-        FactionEntry const *factionEntry1 = sFactionStore.LookupEntry(Rep->repfaction1);
+        FactionEntry const *factionEntry1 = sFactionStore.LookupEntry(Repfaction1);
         uint32 current_reputation_rank1 = GetReputationMgr().GetRank(factionEntry1);
         if (factionEntry1 && current_reputation_rank1 <= Rep->reputation_max_cap1)
             GetReputationMgr().ModifyReputation(factionEntry1, donerep1);
@@ -6343,9 +6376,9 @@ void Player::RewardReputation(Unit *pVictim, float rate)
 
     if(Rep->repfaction2 && (!Rep->team_dependent || GetTeam()==HORDE))
     {
-        int32 donerep2 = CalculateReputationGain(REPUTATION_SOURCE_KILL, Rep->repvalue2, Rep->repfaction2, pVictim->getLevel());
+        int32 donerep2 = CalculateReputationGain(REPUTATION_SOURCE_KILL, Rep->repvalue2, Repfaction2, pVictim->getLevel());
         donerep2 = int32(donerep2*rate);
-        FactionEntry const *factionEntry2 = sFactionStore.LookupEntry(Rep->repfaction2);
+        FactionEntry const *factionEntry2 = sFactionStore.LookupEntry(Repfaction2);
         uint32 current_reputation_rank2 = GetReputationMgr().GetRank(factionEntry2);
         if (factionEntry2 && current_reputation_rank2 <= Rep->reputation_max_cap2)
             GetReputationMgr().ModifyReputation(factionEntry2, donerep2);
@@ -6535,6 +6568,9 @@ bool Player::RewardHonor(Unit *uVictim, uint32 groupsize, float honor)
 
             honor = 100;                                    // ??? need more info
             victim_rank = 19;                               // HK: Leader
+
+            if (groupsize > 1)
+                honor *= groupsize;
         }
     }
 
@@ -7239,7 +7275,7 @@ void Player::_ApplyItemBonuses(ItemPrototype const *proto, uint8 slot, bool appl
             ApplyFeralAPBonus(feral_bonus, apply);
     }
 
-    if(!IsUseEquippedWeapon(slot==EQUIPMENT_SLOT_MAINHAND))
+    if (!IsUseEquippedWeapon(attType))
         return;
 
     if (proto->Delay)
@@ -8464,7 +8500,7 @@ void Player::SendInitWorldStates(uint32 zoneid, uint32 areaid)
             FillInitialWorldState(data,count, ZM_world_states);
             break;
         case 3698:                                          // Nagrand Arena
-            if (bg && bg->GetTypeID() == BATTLEGROUND_NA)
+            if (bg && bg->GetTypeID(true) == BATTLEGROUND_NA)
                 bg->FillInitialWorldStates(data, count);
             else
             {
@@ -9045,7 +9081,7 @@ Item* Player::GetWeaponForAttack(WeaponAttackType attackType, bool nonbroken, bo
     if (!item || item->GetProto()->Class != ITEM_CLASS_WEAPON)
         return NULL;
 
-    if (useable && !IsUseEquippedWeapon(attackType==BASE_ATTACK))
+    if (useable && !IsUseEquippedWeapon(attackType))
         return NULL;
 
     if (nonbroken && item->IsBroken())
@@ -9060,10 +9096,10 @@ Item* Player::GetShield(bool useable) const
     if (!item || item->GetProto()->Class != ITEM_CLASS_ARMOR)
         return NULL;
 
-    if(!useable)
+    if (!useable)
         return item;
 
-    if( item->IsBroken())
+    if (item->IsBroken() || !IsUseEquippedWeapon(OFF_ATTACK))
         return NULL;
 
     return item;
@@ -12329,6 +12365,15 @@ void Player::ApplyEnchantment(Item *item, EnchantmentSlot slot, bool apply, bool
     if (!ignore_condition && pEnchant->EnchantmentCondition && !((Player*)this)->EnchantmentFitsRequirements(pEnchant->EnchantmentCondition, -1))
         return;
 
+    if ((pEnchant->requiredLevel) > ((Player*)this)->getLevel())
+        return;
+
+    if ((pEnchant->requiredSkill) > 0)
+    {
+       if ((pEnchant->requiredSkillValue) > (((Player*)this)->GetSkillValue(pEnchant->requiredSkill)))
+        return;
+    }
+
     if (!item->IsBroken())
     {
         for (int s = 0; s < 3; ++s)
@@ -15496,6 +15541,7 @@ bool Player::LoadFromDB( uint32 guid, SqlQueryHolder *holder )
     // after spell load, learn rewarded spell if need also
     _LoadQuestStatus(holder->GetResult(PLAYER_LOGIN_QUERY_LOADQUESTSTATUS));
     _LoadDailyQuestStatus(holder->GetResult(PLAYER_LOGIN_QUERY_LOADDAILYQUESTSTATUS));
+    _LoadRandomBGStatus(holder->GetResult(PLAYER_LOGIN_QUERY_LOADRANDOMBG));
     _LoadWeeklyQuestStatus(holder->GetResult(PLAYER_LOGIN_QUERY_LOADWEEKLYQUESTSTATUS));
     _LoadMonthlyQuestStatus(holder->GetResult(PLAYER_LOGIN_QUERY_LOADMONTHLYQUESTSTATUS));
 	_LoadRandomBGStatus(holder->GetResult(PLAYER_LOGIN_QUERY_LOADRANDOMBG));
@@ -17779,6 +17825,9 @@ void Player::UpdateDuelFlag(time_t currTime)
 
 void Player::RemovePet(PetSaveMode mode)
 {
+    if (InBattleGround() && mode == PET_SAVE_REAGENTS)
+        mode = PET_SAVE_NOT_IN_SLOT;
+
     if (Pet* pet = GetPet())
         pet->Unsummon(mode, this);
 }
@@ -21463,7 +21512,9 @@ uint8 Player::CanEquipUniqueItem( ItemPrototype const* itemProto, uint8 except_s
 void Player::HandleFall(MovementInfo const& movementInfo)
 {
     // calculate total z distance of the fall
-    float z_diff = m_lastFallZ - movementInfo.GetPos()->z;
+    float z_diff = (m_lastFallZ >= m_anti_BeginFallZ ? m_lastFallZ : m_anti_BeginFallZ) - movementInfo.GetPos()->z;
+
+    m_anti_BeginFallZ=INVALID_HEIGHT;
     DEBUG_LOG("zDiff = %f", z_diff);
 
     //Players with low fall distance, Feather Fall or physical immunity (charges used) are ignored
@@ -21777,6 +21828,12 @@ void Player::UnsummonPetTemporaryIfAny()
     if(!pet)
         return;
 
+    if (((Player*)this)->InArena())
+    {
+        RemovePet(PET_SAVE_REAGENTS); // remove pet while is player teleported to arena
+        return;
+    }
+ 
     if(!m_temporaryUnsummonedPetNumber && pet->isControlled() && !pet->isTemporarySummoned() )
         m_temporaryUnsummonedPetNumber = pet->GetCharmInfo()->GetPetNumber();
 
@@ -22430,6 +22487,16 @@ Object* Player::GetObjectByTypeMask(ObjectGuid guid, TypeMask typemask)
     }
 
     return NULL;
+}
+
+void Player::CompletedAchievement(AchievementEntry const* entry)
+{
+    GetAchievementMgr().CompletedAchievement(entry);
+}
+
+void Player::CompletedAchievement(uint32 uiAchievementID)
+{
+    GetAchievementMgr().CompletedAchievement(sAchievementStore.LookupEntry(uiAchievementID));
 }
 
 void Player::SetRestType( RestType n_r_type, uint32 areaTriggerId /*= 0*/)

@@ -330,6 +330,10 @@ bool Pet::LoadPetFromDB( Player* owner, uint32 petentry, uint32 petnumber, bool 
         }
     }
 
+    //set last used pet number (for use in BG's)
+    if(owner->GetTypeId() == TYPEID_PLAYER && isControlled() && !isTemporarySummoned() && (getPetType() == SUMMON_PET || getPetType() == HUNTER_PET))
+        ((Player*)owner)->SetLastPetNumber(pet_number);
+
     m_loading = false;
 
     SynchronizeLevelWithOwner();
@@ -907,6 +911,8 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
         createResistance[SPELL_SCHOOL_ARCANE] = cinfo->resistance6;
     }
 
+    float attack_bonus = 0.0f;
+
     switch(getPetType())
     {
         case SUMMON_PET:
@@ -930,10 +936,25 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
                     case CLASS_MAGE:
                     {
                                                             //40% damage bonus of mage's frost damage
-                        float val = owner->GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + SPELL_SCHOOL_FROST) * 0.4f;
-                        if(val < 0)
-                            val = 0;
-                        SetBonusDamage( int32(val));
+                        SetBonusDamage(int32(owner->GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + SPELL_SCHOOL_FROST) * 0.4f));
+                        break;
+                    }
+                    case CLASS_PRIEST:
+                    {
+                                                            //30% damage bonus of priest's shadow damage
+                        attack_bonus = owner->GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + SPELL_SCHOOL_SHADOW) * 0.3f;
+                        break;
+                    }
+                    case CLASS_SHAMAN:
+                    {
+                        if (cinfo->Entry == 29264)
+                        {
+                            // 60% with Glyph of Feral Spirit or 30% without glyph
+                            float ap_gain = owner->HasAura(63271) ? 0.6f : 0.3f;
+                            uint32 attack_speed = cinfo->baseattacktime / 1000;
+                            // AP -> Damage conversion
+                            attack_bonus = owner->GetTotalAttackPowerValue(BASE_ATTACK) * ap_gain * attack_speed / 14;
+                        }
                         break;
                     }
                     default:
@@ -941,8 +962,8 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
                 }
             }
 
-            SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(petlevel - (petlevel / 4)) );
-            SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(petlevel + (petlevel / 4)) );
+            SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(petlevel - (petlevel / 4)) + attack_bonus);
+            SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(petlevel + (petlevel / 4)) + attack_bonus);
 
             //SetModifierValue(UNIT_MOD_ATTACK_POWER, BASE_VALUE, float(cinfo->attackpower));
 
@@ -1016,6 +1037,26 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
         }
         case GUARDIAN_PET:
         case PROTECTOR_PET:
+            if(owner->GetTypeId() == TYPEID_PLAYER)
+            {
+                switch(cinfo->Entry)
+                {
+                    case 1964:
+                    {
+                                                            //15% damage bonus of druid's nature damage
+                        attack_bonus = owner->GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + SPELL_SCHOOL_NATURE) * 0.15f;
+                        break;
+                    }
+                    case 27829:
+                    {
+                                                            //40% damage bonus of dk's attack power
+                        SetBonusDamage(int32(owner->GetTotalAttackPowerValue(BASE_ATTACK)*0.4f));
+                        break;
+                    }
+                    default:
+                        break;
+                }
+            }
             SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, 0);
             SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, 1000);
 
@@ -1025,9 +1066,9 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
             // FIXME: this is wrong formula, possible each guardian pet have own damage formula
             //these formula may not be correct; however, it is designed to be close to what it should be
             //this makes dps 0.5 of pets level
-            SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(petlevel - (petlevel / 4)));
+            SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(petlevel - (petlevel / 4)) + attack_bonus);
             //damage range is then petlevel / 2
-            SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(petlevel + (petlevel / 4)));
+            SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(petlevel + (petlevel / 4)) + attack_bonus);
             break;
         default:
             sLog.outError("Pet have incorrect type (%u) for levelup.", getPetType());
@@ -1928,6 +1969,10 @@ bool Pet::Create(uint32 guidlow, Map *map, uint32 phaseMask, uint32 Entry, uint3
     if(getPetType() == MINI_PET)                            // always non-attackable
         SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
 
+    // Bloodworms
+    if (GetEntry() == 28017)
+        CastSpell(this, 50453, true);
+
     return true;
 }
 
@@ -1972,6 +2017,10 @@ void Pet::CastPetAuras(bool current)
         else
             CastPetAura(pa);
     }
+
+    // Feral Spirit
+    if (GetEntry() == 29264)
+        CastSpell(this, 58877, true);
 }
 
 void Pet::CastPetAura(PetAura const* aura)
