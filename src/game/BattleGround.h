@@ -225,11 +225,12 @@ enum BattleGroundWinner
     WINNER_NONE             = 2
 };
 
-enum BattleGroundTeamId
+enum BattleGroundTeamIndex
 {
     BG_TEAM_ALLIANCE        = 0,
     BG_TEAM_HORDE           = 1
 };
+
 #define BG_TEAMS_COUNT  2
 
 enum BattleGroundStartingEvents
@@ -415,7 +416,7 @@ class BattleGround
         void SetTeamStartLoc(uint32 TeamID, float X, float Y, float Z, float O);
         void GetTeamStartLoc(uint32 TeamID, float &X, float &Y, float &Z, float &O) const
         {
-            BattleGroundTeamId idx = GetTeamIndexByTeamId(TeamID);
+            BattleGroundTeamIndex idx = GetTeamIndexByTeamId(TeamID);
             X = m_TeamStartLocX[idx];
             Y = m_TeamStartLocY[idx];
             Z = m_TeamStartLocZ[idx];
@@ -460,7 +461,7 @@ class BattleGround
 
         virtual void UpdatePlayerScore(Player *Source, uint32 type, uint32 value);
 
-        static BattleGroundTeamId GetTeamIndexByTeamId(uint32 Team) { return Team == ALLIANCE ? BG_TEAM_ALLIANCE : BG_TEAM_HORDE; }
+        static BattleGroundTeamIndex GetTeamIndexByTeamId(uint32 Team) { return Team == ALLIANCE ? BG_TEAM_ALLIANCE : BG_TEAM_HORDE; }
         uint32 GetPlayersCountByTeam(uint32 Team) const { return m_PlayersCount[GetTeamIndexByTeamId(Team)]; }
         uint32 GetAlivePlayersCountByTeam(uint32 Team) const;   // used in arenas to correctly handle death in spirit of redemption / last stand etc. (killer = killed) cases
         void UpdatePlayersCountByTeam(uint32 Team, bool remove)
@@ -539,7 +540,8 @@ class BattleGround
 
         // since arenas can be AvA or Hvh, we have to get the "temporary" team of a player
         uint32 GetPlayerTeam(uint64 guid);
-        uint32 GetOtherTeam(uint32 teamId){ return (teamId) ? ((teamId == ALLIANCE) ? HORDE : ALLIANCE) : 0; }
+        static uint32 GetOtherTeam(uint32 teamId){ return (teamId) ? ((teamId == ALLIANCE) ? HORDE : ALLIANCE) : 0; }
+        static BattleGroundTeamIndex GetOtherTeamIndex(BattleGroundTeamIndex teamIdx){ return teamIdx == BG_TEAM_ALLIANCE ? BG_TEAM_HORDE : BG_TEAM_ALLIANCE; }
         bool IsPlayerInBattleGround(uint64 guid);
 
         /* virtual score-array - get's used in bg-subclasses */
