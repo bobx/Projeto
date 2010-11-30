@@ -792,7 +792,7 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket & recv_data)
         if(!mapEntry)
             return;
 
-        bool isRegularTargetMap = GetPlayer()->GetDifficulty(mapEntry->IsRaid()) == REGULAR_DIFFICULTY;
+        bool isRegularTargetMap = !mapEntry->IsDungeon() || GetPlayer()->GetDifficulty(mapEntry->IsRaid()) == REGULAR_DIFFICULTY;
 
         if (!isRegularTargetMap)
         {
@@ -806,7 +806,7 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket & recv_data)
                 missingItem = true;
         }
 
-        if (!isRegularTargetMap && mapEntry->IsDungeon())
+        if (!isRegularTargetMap)
         {
             if (at->requiredQuestHeroic && !GetPlayer()->GetQuestRewardStatus(at->requiredQuestHeroic))
                 missingQuest = true;
