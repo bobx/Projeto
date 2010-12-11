@@ -811,7 +811,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
 		else sLog.outBasic("Pas annoncé xD");
 	}
 
-    if (pCurrChar->isGMVisible())
+    if (!pCurrChar->isGMVisible())
         SendNotification(LANG_INVISIBLE_INVISIBLE);
 
     std::string IP_str = GetRemoteAddress();
