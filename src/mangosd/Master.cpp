@@ -535,6 +535,10 @@ void Master::clearOnlineAccounts()
 
     // Battleground instance ids reset at server restart
     CharacterDatabase.Execute("UPDATE character_battleground_data SET instance_id = 0");
+	
+	// Random Battleground reset 
+	CharacterDatabase.PExecute("TRUNCATE character_battleground_random");
+	sLog.outString("Random Battleground Reset");
 }
 
 /// Handle termination signals
