@@ -149,23 +149,11 @@ extern int main(int argc, char **argv)
     }
 
     sLog.outString( "%s [world-daemon]", _FULLVERSION(REVISION_DATE,REVISION_TIME,REVISION_NR,REVISION_ID) );
-	sLog.outString( "Powered by PaNDORe Core System" );
-    sLog.outString( "<Ctrl-C> pour stoper.\n\n" );
+	sLog.outString( "Desenvolvido por Demons Staff" );
+    sLog.outString( "<Ctrl-C> pour stoper.\n" );
 
-    sLog.outTitle( "PPPPPPP                   NN   NN            OOOO");
-    sLog.outTitle( "PP   PP                   NN   NN           OO  OO RRRRRRRRR");
-    sLog.outTitle( "PP   PP    aaaaaaaaa      NNN  NN DDDDDD    OO  OO RRR    RRR");
-    sLog.outTitle( "PP   PP  aa         aa    NNNN NN DDD DDD   OO  OO RRR     RRR");
-    sLog.outTitle( "PPPPPPP aa   aaaaa   aa   NN NNNN DDD  DDD  OO  OO RRR    RRR   eeeeee");
-    sLog.outTitle( "PP      aa  aa   aa  aa   NN  NNN DDD   DDD OO  OO RRRRRRR     eee  ee");
-    sLog.outTitle( "PP      aa  aa   aa  aa   NN   NN DDD   DDD OO  OO RRR  RRR    eee  ee");
-    sLog.outTitle( "PP      aa  aa   aa aa    NN   NN DDD   DDD OO  OO RRR   RRR   eeeeeee");
-    sLog.outTitle( "PP      aa   aaaaa aa  aa NN   NN DDD  DDD   OOOO  RRR    RRR  eee");
-	sLog.outTitle( "         aa          aa           DDD DDD          RRR     RRR eee   e");
-	sLog.outTitle( "		   aaaaaaaaaa             DDDDDD                        eeeee");
-	sLog.outTitle( "  :D :P ");
-	sLog.outTitle( " Developpement par l'equipe Pandore ");
-    sLog.outTitle( "                                  http://pandore.sourceforge.net/\n\n");
+	sLog.outTitle( "Desenvolvido por Demons Staff, usando como base:");
+    sLog.outTitle( "http://pandore.sourceforge.net/\n\n");
 
     sLog.outString("Utilisation du fichier de configuration %s.", cfg_file);
 

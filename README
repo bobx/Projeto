@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-Aprendendo a usar GitHub.com =)
-=======
 = MaNGOS -- README =
 
 Copyright (C) 2005-2010 MaNGOS project <http://getmangos.com/>
@@ -58,4 +55,3 @@ In case you have checked out MaNGOS from the GIT repository, please run
 $ autoreconf --install --force
 
 prior to building, as you may otherwise not be able to run a build.
->>>>>>> 9dbe1f1455417642cdbfce05c5a3e9889b5bd603

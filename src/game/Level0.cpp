@@ -101,7 +101,7 @@ bool ChatHandler::HandleServerInfoCommand(char* /*args*/)
         full = _FULLVERSION(REVISION_DATE,REVISION_TIME,REVISION_NR,REVISION_ID);
 
     SendSysMessage(full);
-	SendSysMessage( "Powered by PaNDORe Core System" );
+	SendSysMessage("Desenvolvido por Demons Staff");
     PSendSysMessage(LANG_USING_SCRIPT_LIB,sWorld.GetScriptsVersion());
     PSendSysMessage(LANG_USING_WORLD_DB,sWorld.GetDBVersion());
     PSendSysMessage(LANG_USING_EVENT_AI,sWorld.GetCreatureEventAIVersion());
@@ -149,6 +149,7 @@ bool ChatHandler::HandleSaveCommand(char* /*args*/)
     uint32 save_interval = sWorld.getConfig(CONFIG_UINT32_INTERVAL_SAVE);
     if (save_interval==0 || (save_interval > 20*IN_MILLISECONDS && player->GetSaveTimer() <= save_interval - 20*IN_MILLISECONDS))
         player->SaveToDB();
+		SendSysMessage(LANG_PLAYER_SAVED);
 
     return true;
 }

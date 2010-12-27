@@ -11,5 +11,5 @@ INSERT INTO creature_ai_scripts VALUES
 
 DELETE FROM spell_bonus_data WHERE entry IN (59637,59638);
 INSERT INTO spell_bonus_data VALUES
-(59637, 0.10, 0, 0, 'Mirror Image - Fire Blast'),
-(59638, 0.05, 0, 0, 'Mirror Image - Frostbolt');
+(59637, 0.10, 0, 0, 0, 'Mirror Image - Fire Blast'),
+(59638, 0.05, 0, 0, 0, 'Mirror Image - Frostbolt');
