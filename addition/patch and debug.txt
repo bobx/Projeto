@@ -1,0 +1,52 @@
+- Annonce FR (amélioré)
+- Annonce MJ à la connexion/déconnexion (amélioré)
+- Mysql Reconnect
+- Freeze a player
+- Anti-Freeze
+- Interfaction (False.Genesis modifié par Bloutix)
+- Random Battleground (modified by bloutix and patch 71 from kapatejib)
+- Eye of acherus (complément)
+- Level 100 maximum
+- Demonic Circle (modified by bloutix)
+- Poigne de la Mort (modified by bloutix)
+- Image Miroir (modified by Bloutix)
+
+- Chat logs and lexics cutter
+- fix prevent proc spell 49222 from heals
+- patch 95 from kapatejib
+- patch 161 from kapatejib
+- fixed spells 49032, 51099
+- fixed spells 49208, 49467, 54639
+- patch 38 from insider42
+- added missing passive aura for spell 22570
+- patch 62 from kapatejib
+- stoneclaw totem(55277)
+- fixed spell damage bonus for spell 5394
+- fixed spell 46945 (patch 176 by kapatejib)
+- fixed spell 12317 (patch 173)
+- fixed spell 54815, 54845, 56800 (patch 172 from Nevan)
+- fixed spell 324 by insider42
+- fixed spell 56374
+- fixed spell 58387
+- fixed spell damage and attack power for spell 54158
+- fixed spell 56342
+- patch 150 from kapatejib
+- spell healing bonus 33763
+- spell 53601
+- spell 14156
+- spell 14186
+- spell 11103
+- spell 31571
+- spell 44557
+- fixed spell damage bonus for spells 51556 and 55680
+- fixed spell 67297, 66001 with patch 93 from insider42
+- fixed wrong proc of spell 51521
+- prevent proc spell 974
+- patch 125 form kapatejib
+- anticheat v3.0.17 (with small typo by bloutix)
+- nticheat system
+- patch 111 by kapatejib
+- Championing system by energy and kapatejib (patch 105)
+- spell disabling system (patch 100 insider42)
+- And others...
+ 
